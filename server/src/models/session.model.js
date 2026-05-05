@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { refreshToken } from "../controllers/auth.controller";
 
 const sessionSchema = new mongoose.Schema({
   user: {
@@ -31,6 +30,8 @@ const sessionSchema = new mongoose.Schema({
     type: Date,
     default: null,
   },
+},{
+  timestamps:true
 });
 
 sessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
