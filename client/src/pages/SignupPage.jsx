@@ -5,7 +5,7 @@ import BackButton from "../components/BackButton";
 import { useAuth } from "../context/AuthContext";
 
 export default function SignupPage() {
-  const { login } = useAuth();
+  const { signup } = useAuth();
   const navigate = useNavigate();
   const {
     register,
@@ -13,6 +13,12 @@ export default function SignupPage() {
     handleSubmit,
     formState: { errors },
   } = useForm();
+
+  const handleSubmitForm = async (data) => {
+    const {name,email,password} = data
+    signup(name,email,password);
+    navigate("/");
+  };
 
   return (
     <section className="container-base py-12">
@@ -24,13 +30,7 @@ export default function SignupPage() {
       </div>
       <div className="mx-auto max-w-md rounded-2xl bg-white p-6 shadow-soft">
         <h1 className="mb-5 text-2xl font-semibold">Create account</h1>
-        <form
-          className="space-y-4"
-          onSubmit={handleSubmit((data) => {
-            login({ name: data.name, email: data.email, role: "guest" });
-            navigate("/");
-          })}
-        >
+        <form className="space-y-4" onSubmit={handleSubmit(handleSubmitForm)}>
           <input
             {...register("name", { required: "Name is required" })}
             placeholder="Name"
@@ -67,7 +67,7 @@ export default function SignupPage() {
               {errors.confirmPassword.message}
             </p>
           ) : null}
-         
+
           <button className="w-full rounded-xl bg-brand-primary py-3 font-medium text-white hover:bg-brand-dark">
             Sign Up
           </button>

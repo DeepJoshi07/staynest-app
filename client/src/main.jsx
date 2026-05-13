@@ -8,7 +8,6 @@ import { AuthProvider } from "./context/AuthContext";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
     <HelmetProvider>
       <BrowserRouter>
         <AuthProvider>
@@ -17,5 +16,4 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         </AuthProvider>
       </BrowserRouter>
     </HelmetProvider>
-  </React.StrictMode>,
 );

@@ -5,6 +5,7 @@ import Session from "../models/session.model.js";
 
 export const register = async (req, res) => {
   const { username, email, password } = req.body;
+  
 
   const alreadyExists = await User.findOne({
     $or: [{ username }, { email }],
@@ -80,6 +81,7 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   const { email, password } = req.body;
+ 
 
   const user = await User.findOne({ email });
 
@@ -192,8 +194,7 @@ export const logout = async (req, res) => {
 };
 
 export const refreshToken = async (req, res) => {
-  const refreshToken = req.body.refreshToken;
-
+  const refreshToken = req.cookies.refreshToken;
   if (!refreshToken) {
     return res.status(400).json({
       message: "refresh token not found!",
@@ -219,7 +220,7 @@ export const refreshToken = async (req, res) => {
   });
 
   if (!session) {
-    return res.status(401).json({
+    return res.status(400).json({
       message: "invalid refresh token!",
     });
   }
@@ -266,43 +267,43 @@ export const refreshToken = async (req, res) => {
   });
 };
 
-export const logoutAll = async (req, res) => {
-  const refreshToken = req.cookies.refreshToken;
+// export const logoutAll = async (req, res) => {
+//   const refreshToken = req.cookies.refreshToken;
 
-  if (!refreshToken) {
-    return res.status(400).json({
-      message: "refresh token not found",
-    });
-  }
+//   if (!refreshToken) {
+//     return res.status(400).json({
+//       message: "refresh token not found",
+//     });
+//   }
 
-  const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+//   const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
 
-  if (!decoded) {
-    return res.status(400).json({
-      message: "invalid refresh token",
-    });
-  }
-  console.log(decoded.id);
-  await Session.updateMany(
-    {
-      user: decoded.id,
-      revoked: false,
-    },
-    {
-      $set: {
-        revokedAt: new Date(),
-        
-        revoked: true,
-      },
-      $unset:{
-        expiresAt: "",
-      }
-    },
-  );
+//   if (!decoded) {
+//     return res.status(400).json({
+//       message: "invalid refresh token",
+//     });
+//   }
+//   console.log(decoded.id);
+//   await Session.updateMany(
+//     {
+//       user: decoded.id,
+//       revoked: false,
+//     },
+//     {
+//       $set: {
+//         revokedAt: new Date(),
 
-  res.clearCookie("refreshToken");
+//         revoked: true,
+//       },
+//       $unset:{
+//         expiresAt: "",
+//       }
+//     },
+//   );
 
-  return res.status(200).json({
-    message: "user logged out from all devices successfully!",
-  });
-};
+//   res.clearCookie("refreshToken");
+
+//   return res.status(200).json({
+//     message: "user logged out from all devices successfully!",
+//   });
+// };

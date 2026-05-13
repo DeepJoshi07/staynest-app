@@ -1,21 +1,31 @@
 import express from "express";
-import connectDB from "./config/db.js"
-import "dotenv/config"
-import cookieParser from 'cookie-parser'
-import authRouter from "./routes/auth.route.js"
+import connectDB from "./config/db.js";
+import "dotenv/config";
+import cookieParser from "cookie-parser";
+import authRouter from "./routes/auth.route.js";
+import cors from "cors";
 
-const PORT = process.env.PORT || 5001
+const PORT = process.env.PORT || 5001;
 
-const app = express()
+const app = express();
 
-app.use(cookieParser())
-app.use(express.json())
+const corsOptions = {
+  origin: "http://localhost:5173",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
 
-app.use("/api/auth",authRouter);
+app.use(cors(corsOptions));
+// app.options("*", cors(corsOptions));
 
+app.use(cookieParser());
+app.use(express.json());
 
-connectDB().then(()=>{
-    app.listen(PORT,()=>{
-        console.log(`app is listening on port ${PORT}`)
-    })
-})
+app.use("/api/auth", authRouter);
+
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`app is listening on port ${PORT}`);
+  });
+});

@@ -15,6 +15,13 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm();
 
+  const handleSubmitForm = async (data) => {
+    const result = await login(data.email, data.password);
+    if(result.status === 200){
+      navigate("/")
+    }
+  };
+
   return (
     <section className="container-base py-12">
       <Helmet>
@@ -25,14 +32,9 @@ export default function LoginPage() {
       </div>
       <div className="mx-auto max-w-md rounded-2xl bg-white p-6 shadow-soft">
         <h1 className="mb-5 text-2xl font-semibold">Login</h1>
-        <form
-          className="space-y-4"
-          onSubmit={handleSubmit((data) => {
-            login({ name: "Guest", email: data.email, role: "guest" });
-            navigate(from, { replace: true });
-          })}
-        >
+        <form className="space-y-4" onSubmit={handleSubmit(handleSubmitForm)}>
           <input
+          type="email"
             {...register("email", { required: "Email is required" })}
             placeholder="Email"
             className="w-full rounded-xl border px-4 py-3"
@@ -49,8 +51,7 @@ export default function LoginPage() {
           {errors.password ? (
             <p className="text-sm text-red-600">{errors.password.message}</p>
           ) : null}
-         
-          
+
           <button className="w-full rounded-xl bg-brand-primary py-3 font-medium text-white hover:bg-brand-dark">
             Login
           </button>
