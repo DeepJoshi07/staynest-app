@@ -24,9 +24,12 @@ export default function ListingCard({ listing }) {
           </div>
           <p className="text-sm text-slate-500">{listing.location}</p>
           <p className="font-medium">
-            ${listing.price} <span className="text-sm font-normal text-slate-500">night</span>
+            ${listing.price}{" "}
+            <span className="text-sm font-normal text-slate-500">night</span>
           </p>
-          <span className="inline-block text-sm text-brand-primary hover:underline">View details</span>
+          <span className="inline-block text-sm text-brand-primary hover:underline">
+            View details
+          </span>
         </div>
       </Link>
     </article>

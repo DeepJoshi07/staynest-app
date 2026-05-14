@@ -17,8 +17,8 @@ export default function LoginPage() {
 
   const handleSubmitForm = async (data) => {
     const result = await login(data.email, data.password);
-    if(result.status === 200){
-      navigate("/")
+    if (result.status === 200) {
+      navigate("/");
     }
   };
 
@@ -27,14 +27,14 @@ export default function LoginPage() {
       <Helmet>
         <title>Login | Staynest</title>
       </Helmet>
-      <div className="mx-auto mb-4 max-w-md">
+      {/* <div className="mx-auto mb-4 max-w-md">
         <BackButton />
-      </div>
+      </div> */}
       <div className="mx-auto max-w-md rounded-2xl bg-white p-6 shadow-soft">
         <h1 className="mb-5 text-2xl font-semibold">Login</h1>
         <form className="space-y-4" onSubmit={handleSubmit(handleSubmitForm)}>
           <input
-          type="email"
+            type="email"
             {...register("email", { required: "Email is required" })}
             placeholder="Email"
             className="w-full rounded-xl border px-4 py-3"

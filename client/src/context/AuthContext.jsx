@@ -70,7 +70,6 @@ export function AuthProvider({ children }) {
       const result = await api.post("/auth/refresh-token", {});
 
       if (result.status === 200 && result.data.accessToken) {
-        console.log(result.data.accessToken);
         setAccessToken(result.data.accessToken);
       }
 

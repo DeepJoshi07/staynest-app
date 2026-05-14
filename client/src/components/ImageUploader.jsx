@@ -14,10 +14,22 @@ export default function ImageUploader({ onChange }) {
   return (
     <div className="space-y-3">
       <label className="block text-sm font-medium">Upload image</label>
-      <input type="file" accept="image/*" onChange={handleFile} className="block w-full text-sm" />
-      <p className="text-xs text-slate-500">Cloudinary integration point: POST /api/upload</p>
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleFile}
+        className="block w-full text-sm"
+      />
+      <p className="text-xs text-slate-500">
+        Cloudinary integration point: POST /api/upload
+      </p>
       {preview ? (
-        <img src={preview} alt="Preview" className="h-48 w-full rounded-xl object-cover" loading="lazy" />
+        <img
+          src={preview}
+          alt="Preview"
+          className="h-48 w-full rounded-xl object-cover"
+          loading="lazy"
+        />
       ) : null}
     </div>
   );

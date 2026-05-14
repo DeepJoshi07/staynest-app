@@ -2,7 +2,22 @@ import { Helmet } from "react-helmet-async";
 import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import BackButton from "../components/BackButton";
-import { mockListings } from "../utils/mockData";
+import { mockListings, reviews } from "../utils/mockData";
+
+// const from = "2026-05-14"; // input.value
+// const till = "2026-05-20"; // input.value
+
+// // Convert to Date objects
+// const fromDate = new Date(from);
+// const tillDate = new Date(till);
+
+// // Difference in milliseconds
+// const diffMs = tillDate - fromDate;
+
+// // Convert to days
+// const diffDays = diffMs / (1000 * 60 * 60 * 24);
+
+// console.log(diffDays);
 
 export default function ListingDetailsPage() {
   const { id } = useParams();
@@ -12,14 +27,18 @@ export default function ListingDetailsPage() {
   );
   const [activeImage, setActiveImage] = useState(0);
 
+  const handleSubmit = (detail) => {
+    console.log(detail)
+  }
+
   return (
     <section className="container-base py-10">
       <Helmet>
         <title>{listing.title} | Staynest</title>
       </Helmet>
-      <div className="mb-4">
+      {/* <div className="mb-4">
         <BackButton />
-      </div>
+      </div> */}
       <h1 className="mb-5 text-3xl font-semibold">{listing.title}</h1>
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
@@ -68,96 +87,94 @@ export default function ListingDetailsPage() {
               Reviews
             </h3>
             <div className="grid gap-4 md:grid-cols-2">
-              {listing.reviews.map((r) => (
-                <div
-                  key={r.id}
-                  className="rounded-2xl bg-white p-5 shadow-sm border border-slate-100"
-                >
-                  <div className="mb-3 flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 font-bold text-slate-600">
-                      {r.author.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="font-medium text-slate-800">{r.author}</p>
-                      <p className="text-sm text-slate-500">October 2023</p>
-                    </div>
-                  </div>
-                  <p className="text-slate-600">{r.comment}</p>
-                </div>
+              {reviews.map((r) => (
+                <Reviews key={r.id} review={r} />
               ))}
-              <div className="rounded-2xl bg-white p-5 shadow-sm border border-slate-100">
-                <div className="mb-3 flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 font-bold text-slate-600">
-                    J
-                  </div>
-                  <div>
-                    <p className="font-medium text-slate-800">John Doe</p>
-                    <p className="text-sm text-slate-500">September 2023</p>
-                  </div>
-                </div>
-                <p className="text-slate-600">
-                  This was an absolutely fantastic experience. The place was
-                  clean, and the location could not be better. Highly recommend!
-                </p>
-              </div>
-              <div className="rounded-2xl bg-white p-5 shadow-sm border border-slate-100">
-                <div className="mb-3 flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 font-bold text-slate-600">
-                    E
-                  </div>
-                  <div>
-                    <p className="font-medium text-slate-800">Emily Smith</p>
-                    <p className="text-sm text-slate-500">August 2023</p>
-                  </div>
-                </div>
-                <p className="text-slate-600">
-                  Great value for the price. The amenities were exactly as
-                  described. Will definitely book again when we are in town.
-                </p>
-              </div>
             </div>
           </div>
         </div>
-        <aside className="h-fit rounded-2xl bg-white p-5 shadow-soft">
-          <p className="text-2xl font-semibold">
-            ${listing.price}{" "}
-            <span className="text-sm font-normal text-slate-500">night</span>
-          </p>
-          <div className="mt-4 space-y-3">
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-slate-600">From</label>
-              <input
-                type="date"
-                className="w-full rounded-xl border px-3 py-2"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-slate-600">Till</label>
-              <input
-                type="date"
-                className="w-full rounded-xl border px-3 py-2"
-              />
-            </div>
-            <input
-              type="number"
-              min="1"
-              defaultValue="1"
-              className="w-full rounded-xl border px-3 py-2"
-            />
-          </div>
-          <button className="mt-4 w-full rounded-xl bg-brand-primary py-3 text-white hover:bg-brand-dark">
-            Reserve
-          </button>
-          <div className="mt-4 flex items-center gap-3 text-sm">
-            <img
-              src={listing.host.avatar}
-              alt={listing.host.name}
-              className="h-8 w-8 rounded-full"
-            />
-            Hosted by {listing.host.name}
-          </div>
-        </aside>
+        <Reserve listing={listing} onClick={handleSubmit}/>
       </div>
     </section>
   );
 }
+
+const Reviews = ({ review }) => {
+  return (
+    <div
+      key={review.id}
+      className="rounded-2xl bg-white p-5 shadow-sm border border-slate-100"
+    >
+      <div className="mb-3 flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 font-bold text-slate-600">
+          {review.author.charAt(0)}
+        </div>
+        <div>
+          <p className="font-medium text-slate-800">{review.author}</p>
+          <p className="text-sm text-slate-500">October 2023</p>
+        </div>
+      </div>
+      <p className="text-slate-600">{review.comment}</p>
+    </div>
+  );
+};
+
+const Reserve = ({listing,onClick}) => {
+  const [deatil,setDatail] = useState({
+    price:listing.price,
+    from:"",
+    till:"",
+    people:1
+  })
+
+  const handlesubmit = () => {
+    onClick(deatil)
+  }
+  return (
+    <aside className="h-fit rounded-2xl bg-white p-5 shadow-soft">
+      <p className="text-2xl font-semibold">
+        ${listing.price}{" "}
+        <span className="text-sm font-normal text-slate-500">night</span>
+      </p>
+      <div className="mt-4 space-y-3">
+        <div className="space-y-1">
+          <label className="text-xs font-medium text-slate-600">From</label>
+          <input
+            type="date"
+            className="w-full text-slate-400 rounded-xl border px-3 py-2"
+            onChange={(e) => setDatail({...deatil,from:e.target.value})}
+          />
+        </div>
+        <div className="space-y-1">
+          <label className="text-xs font-medium text-slate-600">Till</label>
+          <input
+            type="date"
+            className="w-full text-slate-400 rounded-xl border px-3 py-2"
+            onChange={(e) => setDatail({...deatil,till:e.target.value})}
+          />
+        </div>
+        <input
+          type="number"
+          min="1"
+          onChange={(e) => setDatail({...deatil,people:e.target.value})}
+          // defaultValue="1"
+          placeholder="For how many people?"
+          className="w-full rounded-xl border px-3 py-2"
+        />
+      </div>
+      <button className="mt-4 w-full rounded-xl bg-brand-primary py-3 text-white hover:bg-brand-dark"
+        onClick={handlesubmit}
+      >
+        Reserve
+      </button>
+      <div className="mt-4 flex items-center gap-3 text-sm">
+        <img
+          src={listing.host.avatar}
+          alt={listing.host.name}
+          className="h-8 w-8 rounded-full"
+        />
+        Hosted by {listing.host.name}
+      </div>
+    </aside>
+  );
+};

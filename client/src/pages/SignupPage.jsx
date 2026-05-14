@@ -15,9 +15,11 @@ export default function SignupPage() {
   } = useForm();
 
   const handleSubmitForm = async (data) => {
-    const {name,email,password} = data
-    signup(name,email,password);
-    navigate("/");
+    const { name, email, password } = data;
+    const result = await signup(name, email, password);
+    if (result.status === 200) {
+      navigate("/");
+    }
   };
 
   return (
@@ -25,9 +27,9 @@ export default function SignupPage() {
       <Helmet>
         <title>Sign Up | Staynest</title>
       </Helmet>
-      <div className="mx-auto mb-4 max-w-md">
+      {/* <div className="mx-auto mb-4 max-w-md">
         <BackButton />
-      </div>
+      </div> */}
       <div className="mx-auto max-w-md rounded-2xl bg-white p-6 shadow-soft">
         <h1 className="mb-5 text-2xl font-semibold">Create account</h1>
         <form className="space-y-4" onSubmit={handleSubmit(handleSubmitForm)}>

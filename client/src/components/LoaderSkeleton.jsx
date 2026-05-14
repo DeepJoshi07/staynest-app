@@ -1,6 +1,10 @@
 export default function LoaderSkeleton({ variant = "grid" }) {
   if (variant === "page") {
-    return <div className="container-base py-10"><div className="h-72 animate-pulse rounded-2xl bg-slate-200" /></div>;
+    return (
+      <div className="container-base py-10">
+        <div className="h-72 animate-pulse rounded-2xl bg-slate-200" />
+      </div>
+    );
   }
 
   return (

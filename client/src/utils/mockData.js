@@ -202,3 +202,16 @@ export const mockBookings = [
     status: "Upcoming",
   },
 ];
+
+export const reviews = [
+  { id: 1, author: "Alice", comment: "Great experience, very smooth process!" },
+  { id: 2, author: "Bob", comment: "The UI could be more intuitive, but overall good." },
+  { id: 3, author: "Charlie", comment: "Fast delivery and excellent support." },
+  { id: 4, author: "Diana", comment: "Loved the attention to detail in design." },
+  { id: 5, author: "Ethan", comment: "Performance is solid, but documentation needs improvement." },
+  { id: 6, author: "Fiona", comment: "Customer service was responsive and helpful." },
+  { id: 7, author: "George", comment: "Setup was easy, and everything worked as expected." },
+  { id: 8, author: "Hannah", comment: "A few minor bugs, but nothing critical." },
+  { id: 9, author: "Ian", comment: "Clean interface and reliable functionality." },
+  { id: 10, author: "Jasmine", comment: "Exceeded my expectations, highly recommend!" }
+];

@@ -9,9 +9,19 @@ export default function HomePage() {
   const navigate = useNavigate();
   const [filters, setFilters] = useState({ location: "", guests: "" });
 
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (filters.location) params.set("location", filters.location);
+    if (filters.guests) params.set("guests", filters.guests);
+    navigate(`/listings?${params.toString()}`);
+  };
+
   return (
     <>
-      <Helmet><title>Staynest | Home</title></Helmet>
+      <Helmet>
+        <title>Staynest | Home</title>
+      </Helmet>
       <section className="relative overflow-hidden">
         <img
           src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1400&q=80"
@@ -24,19 +34,16 @@ export default function HomePage() {
             Find your next stay
           </h1>
           <p className="max-w-xl text-sm text-slate-100 md:text-base">
-            Explore unique homes, cozy cabins, and luxury villas around the world.
+            Explore unique homes, cozy cabins, and luxury villas around the
+            world.
           </p>
           <SearchBar
             filters={filters}
-            showDates={false}
-            onChange={(key, value) => setFilters((prev) => ({ ...prev, [key]: value }))}
-            onSubmit={(e) => {
-              e.preventDefault();
-              const params = new URLSearchParams();
-              if (filters.location) params.set("location", filters.location);
-              if (filters.guests) params.set("guests", filters.guests);
-              navigate(`/listings?${params.toString()}`);
-            }}
+            showDates={true}
+            onChange={(key, value) =>
+              setFilters((prev) => ({ ...prev, [key]: value }))
+            }
+            onSubmit={handleSearch}
           />
           <div>
             <Link
@@ -52,7 +59,9 @@ export default function HomePage() {
       <section className="container-base py-10">
         <h2 className="mb-5 text-2xl font-semibold">Featured stays</h2>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {mockListings.map((listing) => <ListingCard key={listing.id} listing={listing} />)}
+          {mockListings.map((listing) => (
+            <ListingCard key={listing.id} listing={listing} />
+          ))}
         </div>
       </section>
     </>

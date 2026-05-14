@@ -11,8 +11,12 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
       <div className="container-base flex h-20 items-center justify-between gap-4">
-        <Link to="/" className="flex gap-1 text-xl font-bold text-brand-primary">
-          <HomeIcon/>staynest
+        <Link
+          to="/"
+          className="flex gap-1 text-xl font-bold text-brand-primary"
+        >
+          <HomeIcon />
+          staynest
         </Link>
         <button
           className="hidden items-center gap-2 rounded-full border px-4 py-2 text-sm shadow-sm transition hover:shadow md:flex"
@@ -21,18 +25,30 @@ export default function Navbar() {
           <Search size={16} /> Anywhere · Any week · Add guests
         </button>
         <nav className=" hidden items-center gap-2 md:flex">
-          <NavLink to="/listings" className="rounded-full px-3 py-2 text-sm hover:bg-slate-100">
+          <NavLink
+            to="/listings"
+            className="rounded-full px-3 py-2 text-sm hover:bg-slate-100"
+          >
             Explore
           </NavLink>
           {accessToken ? (
             <>
-              <NavLink to="/dashboard" className="rounded-full px-3 py-2 text-sm hover:bg-slate-100">
+              <NavLink
+                to="/dashboard"
+                className="rounded-full px-3 py-2 text-sm hover:bg-slate-100"
+              >
                 My Bookings
               </NavLink>
-              <NavLink to="/host/add" className="rounded-full px-3 py-2 text-sm hover:bg-slate-100">
+              <NavLink
+                to="/host/add"
+                className="rounded-full px-3 py-2 text-sm hover:bg-slate-100"
+              >
                 Add listing
               </NavLink>
-              <NavLink to="/dashboard/listings" className="rounded-full px-3 py-2 text-sm hover:bg-slate-100">
+              <NavLink
+                to="/dashboard/listings"
+                className="rounded-full px-3 py-2 text-sm hover:bg-slate-100"
+              >
                 My Listings
               </NavLink>
               <button
@@ -44,10 +60,16 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <NavLink to="/login" className="rounded-full px-3 py-2 text-sm hover:bg-slate-100">
+              <NavLink
+                to="/login"
+                className="rounded-full px-3 py-2 text-sm hover:bg-slate-100"
+              >
                 Become a host
               </NavLink>
-              <NavLink to="/login" className="rounded-full px-3 py-2 text-sm hover:bg-slate-100">
+              <NavLink
+                to="/login"
+                className="rounded-full px-3 py-2 text-sm hover:bg-slate-100"
+              >
                 Login
               </NavLink>
               <NavLink

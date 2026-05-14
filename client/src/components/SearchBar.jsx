@@ -9,7 +9,11 @@ export default function SearchBar({
     <form
       onSubmit={onSubmit}
       className={`grid gap-3 rounded-2xl bg-white p-4 shadow-soft ${
-        showDates ? (compact ? "md:grid-cols-4" : "md:grid-cols-5") : "md:grid-cols-3"
+        showDates
+          ? compact
+            ? "md:grid-cols-4"
+            : "md:grid-cols-5"
+          : "md:grid-cols-3"
       }`}
     >
       <input
@@ -24,7 +28,7 @@ export default function SearchBar({
           <label className="text-xs font-medium text-slate-600">From</label>
           <input
             type="date"
-            className="w-full rounded-xl border px-4 py-2 text-slate-800"
+            className="w-full rounded-xl text-slate-400 border px-4 py-2 "
             aria-label="From date"
           />
         </div>
@@ -34,7 +38,7 @@ export default function SearchBar({
           <label className="text-xs font-medium text-slate-600">Till</label>
           <input
             type="date"
-            className="w-full rounded-xl border px-4 py-2 text-slate-800"
+            className="w-full rounded-xl text-slate-400 border px-4 py-2"
             aria-label="Till date"
           />
         </div>
