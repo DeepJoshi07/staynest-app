@@ -194,40 +194,9 @@ export const logout = async (req, res) => {
 };
 
 export const refreshToken = async (req, res) => {
-  const refreshToken = req.cookies.refreshToken;
-  if (!refreshToken) {
-    return res.status(400).json({
-      message: "refresh token not found!",
-    });
-  }
-
-  const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
-
-  if (!decoded) {
-    return res.status(400).json({
-      message: "invalid refresh token!",
-    });
-  }
-
-  const refreshTokenHash = crypto
-    .createHash("sha256")
-    .update(refreshToken)
-    .digest("hex");
-
-  const session = await Session.findOne({
-    refreshTokenHash,
-    revoked: false,
-  });
-
-  if (!session) {
-    return res.status(400).json({
-      message: "invalid refresh token!",
-    });
-  }
-
   const newRfreshToken = jwt.sign(
     {
-      id: decoded.id,
+      id: req.userId,
     },
     process.env.JWT_SECRET,
     {
@@ -236,8 +205,8 @@ export const refreshToken = async (req, res) => {
   );
   const accessToken = jwt.sign(
     {
-      id: decoded.id,
-      sessionId: session._id,
+      id: req.userId,
+      sessionId: req.sessionId,
     },
     process.env.JWT_SECRET,
     {
@@ -249,6 +218,8 @@ export const refreshToken = async (req, res) => {
     .createHash("sha256")
     .update(newRfreshToken)
     .digest("hex");
+
+  const session = await Session.findById(req.sessionId);
 
   session.refreshTokenHash = newRfreshTokenHash;
   session.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
@@ -267,6 +238,9 @@ export const refreshToken = async (req, res) => {
   });
 };
 
+export const updateImage = async(req,res) => {
+  
+}
 // export const logoutAll = async (req, res) => {
 //   const refreshToken = req.cookies.refreshToken;
 

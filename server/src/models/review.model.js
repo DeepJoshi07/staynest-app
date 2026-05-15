@@ -2,7 +2,8 @@ import mongoose from "mongoose";
 
 const reviewSchema = new mongoose.Schema({
     author:{
-        type:String,
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"users",
         required:[true,"Author is required"]
     },
     rating:{

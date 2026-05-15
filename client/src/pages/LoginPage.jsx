@@ -1,7 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import BackButton from "../components/BackButton";
 import { useAuth } from "../context/AuthContext";
 
 export default function LoginPage() {
@@ -27,9 +26,6 @@ export default function LoginPage() {
       <Helmet>
         <title>Login | Staynest</title>
       </Helmet>
-      {/* <div className="mx-auto mb-4 max-w-md">
-        <BackButton />
-      </div> */}
       <div className="mx-auto max-w-md rounded-2xl bg-white p-6 shadow-soft">
         <h1 className="mb-5 text-2xl font-semibold">Login</h1>
         <form className="space-y-4" onSubmit={handleSubmit(handleSubmitForm)}>

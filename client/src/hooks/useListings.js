@@ -19,8 +19,12 @@ export default function useListings(filters = {}, page = 1, perPage = 6) {
       const locationOk = filters.location
         ? item.location.toLowerCase().includes(filters.location.toLowerCase())
         : true;
-      const priceOk = filters.maxPrice ? item.price <= Number(filters.maxPrice) : true;
-      const guestsOk = filters.guests ? item.guests >= Number(filters.guests) : true;
+      const priceOk = filters.maxPrice
+        ? item.price <= Number(filters.maxPrice)
+        : true;
+      const guestsOk = filters.guests
+        ? item.guests >= Number(filters.guests)
+        : true;
       return locationOk && priceOk && guestsOk;
     });
   }, [data, filters]);

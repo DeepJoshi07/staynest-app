@@ -16,6 +16,7 @@ export const useAuth = () => useContext(AuthContext);
 
 export function AuthProvider({ children }) {
   const [accessToken, setAccessToken] = useState(null);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const api = UseApi();
 
@@ -24,6 +25,7 @@ export function AuthProvider({ children }) {
       const result = await api.post("/auth/login", { email, password });
       if (result) {
         setAccessToken(result.data.accessToken);
+        if (result.data.user) setUser(result.data.user);
       }
 
       toast.success("login successfully!");
@@ -38,7 +40,10 @@ export function AuthProvider({ children }) {
   const logout = useCallback(async () => {
     try {
       const result = await api.post("/auth/logout", {});
-      if (result) setAccessToken(null);
+      if (result) {
+        setAccessToken(null);
+        setUser(null);
+      }
       return { status: result.status };
     } catch (error) {
       toast.error("logout error");
@@ -55,6 +60,7 @@ export function AuthProvider({ children }) {
       );
       if (result) {
         setAccessToken(result.data.accessToken);
+        if (result.data.user) setUser(result.data.user);
       }
 
       toast.success("Signup successfully!");
@@ -71,13 +77,17 @@ export function AuthProvider({ children }) {
 
       if (result.status === 200 && result.data.accessToken) {
         setAccessToken(result.data.accessToken);
+        if (result.data.user) setUser(result.data.user);
       }
 
       return { status: result.status };
     } catch (error) {
-      toast.error("refresh-token error");
       console.log("refresh-token error: ", error);
     }
+  }, []);
+
+  const updateUser = useCallback((updatedFields) => {
+    setUser((prev) => (prev ? { ...prev, ...updatedFields } : null));
   }, []);
 
   useEffect(() => {
@@ -90,12 +100,14 @@ export function AuthProvider({ children }) {
   const value = useMemo(
     () => ({
       accessToken,
+      user,
       login,
       logout,
       refreshToken,
       signup,
+      updateUser,
     }),
-    [accessToken, login, logout, refreshToken, signup],
+    [accessToken, user, login, logout, refreshToken, signup, updateUser],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

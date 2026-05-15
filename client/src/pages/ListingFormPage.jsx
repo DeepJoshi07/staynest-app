@@ -2,7 +2,6 @@ import { Helmet } from "react-helmet-async";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import BackButton from "../components/BackButton";
 import ImageUploader from "../components/ImageUploader";
 import { amenitiesList } from "../utils/mockData";
 
@@ -20,9 +19,7 @@ export default function ListingFormPage({ mode = "add" }) {
       <Helmet>
         <title>{mode === "add" ? "Add" : "Edit"} Listing | Staynest</title>
       </Helmet>
-      {/* <div className="mb-4">
-        <BackButton />
-      </div> */}
+      
       <div className="mx-auto max-w-3xl rounded-2xl bg-white p-6 shadow-soft">
         <h1 className="mb-5 text-2xl font-semibold">
           {mode === "add" ? "Add" : "Edit"} Listing

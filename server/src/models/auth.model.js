@@ -13,6 +13,17 @@ const authSchema = new mongoose.Schema({
         type:String,
         required:[true,"Password is required"]
     },
+    mylistings:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"listings"
+    },
+    mybookings:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"listings"
+    },
+    image:{
+        type:String,
+    }
 
 },{
     timestamps:true

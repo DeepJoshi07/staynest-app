@@ -1,6 +1,5 @@
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
-import BackButton from "../components/BackButton";
 import { mockBookings, mockListings } from "../utils/mockData";
 
 export default function DashboardPage() {
@@ -9,9 +8,6 @@ export default function DashboardPage() {
       <Helmet>
         <title>Dashboard | Staynest</title>
       </Helmet>
-      {/* <div className="mb-4">
-        <BackButton />
-      </div> */}
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-semibold">My Bookings</h1>
         <Link

@@ -1,7 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import BackButton from "../components/BackButton";
 import ListingCard from "../components/ListingCard";
 import LoaderSkeleton from "../components/LoaderSkeleton";
 import useListings from "../hooks/useListings";
@@ -29,9 +28,6 @@ export default function ListingsPage() {
       <Helmet>
         <title>Listings | Staynest</title>
       </Helmet>
-      {/* <div className="mb-4">
-        <BackButton />
-      </div> */}
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold">Explore stays</h1>
         <Link

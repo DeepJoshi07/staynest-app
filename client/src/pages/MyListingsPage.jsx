@@ -1,6 +1,5 @@
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
-import BackButton from "../components/BackButton";
 import { mockListings } from "../utils/mockData";
 
 export default function MyListingsPage() {
@@ -9,9 +8,7 @@ export default function MyListingsPage() {
       <Helmet>
         <title>My Listings | Staynest</title>
       </Helmet>
-      {/* <div className="mb-4">
-        <BackButton label="Dashboard" />
-      </div> */}
+     
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold">My Listings</h1>
         <Link

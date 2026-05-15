@@ -42,10 +42,8 @@ const listingSchema = new mongoose.Schema({
         require:[true,"Images are required"]
     },
     host: {
-        type:{
-            name:String,
-            avatar:String
-        },
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"users",
         required:[true,"Host is required"]
     },
     reviews: [{

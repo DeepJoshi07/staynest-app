@@ -1,7 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-import BackButton from "../components/BackButton";
 import { mockListings, reviews } from "../utils/mockData";
 
 // const from = "2026-05-14"; // input.value
@@ -36,9 +35,6 @@ export default function ListingDetailsPage() {
       <Helmet>
         <title>{listing.title} | Staynest</title>
       </Helmet>
-      {/* <div className="mb-4">
-        <BackButton />
-      </div> */}
       <h1 className="mb-5 text-3xl font-semibold">{listing.title}</h1>
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
