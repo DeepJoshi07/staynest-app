@@ -23,6 +23,7 @@ export function AuthProvider({ children }) {
   const login = useCallback(async (email, password) => {
     try {
       const result = await api.post("/auth/login", { email, password });
+      console.log(result);
       if (result) {
         setAccessToken(result.data.accessToken);
         if (result.data.user) setUser(result.data.user);
@@ -86,8 +87,14 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  const updateUser = useCallback((updatedFields) => {
-    setUser((prev) => (prev ? { ...prev, ...updatedFields } : null));
+  const updateImage = useCallback(async (formData) => {
+    console.log("hello")
+    const result = await api.post("/auth/update-user-image", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    if (result.status === 200) {
+      return { message: "user image updated!" };
+    }
   }, []);
 
   useEffect(() => {
@@ -105,9 +112,9 @@ export function AuthProvider({ children }) {
       logout,
       refreshToken,
       signup,
-      updateUser,
+      updateImage,
     }),
-    [accessToken, user, login, logout, refreshToken, signup, updateUser],
+    [accessToken, user, login, logout, refreshToken, signup, updateImage],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

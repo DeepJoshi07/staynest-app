@@ -11,7 +11,7 @@ router.post("/login",wrapper(login))
 router.post("/logout",wrapper(logout))
 // router.post("/logout-all",wrapper(logoutAll))
 router.post("/refresh-token",authUser,wrapper(refreshToken))
-router.post("/update-user-image",authUser,upload.single("image"),wrapper(updateImage))
+router.post("/update-user-image",upload.single("image"),authUser,wrapper(updateImage))
 
 
 export default router;

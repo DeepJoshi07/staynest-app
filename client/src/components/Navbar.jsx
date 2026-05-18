@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
 
 export default function Navbar() {
-  const { accessToken, user, logout, updateUser } = useAuth();
+  const { accessToken, user, logout, updateImage } = useAuth();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -47,16 +47,11 @@ export default function Navbar() {
     setUploading(true);
     try {
       const formData = new FormData();
-      formData.append("avatar", file);
+      formData.append("image", file);
       // POST to your upload endpoint — adjust URL as needed
-      const res = await fetch("/api/upload/avatar", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-      if (data?.url) {
-        updateUser({ avatar: data.url });
-        toast.success("Profile photo updated!");
+      const res = await updateImage(formData);
+      if(res.message){
+        toast.success(res.message)
       }
     } catch {
       toast.error("Failed to upload image");
@@ -106,7 +101,10 @@ export default function Navbar() {
         aria-label="Upload profile photo"
       />
       <div className="container-base flex h-20 items-center justify-between gap-4">
-        <Link to="/" className="flex gap-1 text-xl font-bold text-brand-primary">
+        <Link
+          to="/"
+          className="flex gap-1 text-xl font-bold text-brand-primary"
+        >
           <HomeIcon />
           staynest
         </Link>
@@ -296,15 +294,21 @@ export default function Navbar() {
                       </span>
                     )}
                     <span className="absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-white border border-slate-200 shadow-sm">
-                      {uploading
-                        ? <div className="h-3 w-3 border border-brand-primary border-t-transparent rounded-full animate-spin" />
-                        : <Camera size={11} className="text-slate-600" />}
+                      {uploading ? (
+                        <div className="h-3 w-3 border border-brand-primary border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Camera size={11} className="text-slate-600" />
+                      )}
                     </span>
                   </button>
                   <div className="min-w-0">
-                    <p className="font-semibold text-slate-800 text-sm truncate">{displayName}</p>
+                    <p className="font-semibold text-slate-800 text-sm truncate">
+                      {displayName}
+                    </p>
                     {displayEmail && (
-                      <p className="text-slate-500 text-xs truncate">{displayEmail}</p>
+                      <p className="text-slate-500 text-xs truncate">
+                        {displayEmail}
+                      </p>
                     )}
                     <button
                       onClick={() => fileInputRef.current?.click()}

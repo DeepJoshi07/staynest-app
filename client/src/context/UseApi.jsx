@@ -6,12 +6,15 @@ export const UseApi = () => {
 
   const accessToken = auth?.accessToken;
 
-  api.interceptors.request.use((config) => {
+  if(accessToken){
+    api.interceptors.request.use((config) => {
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
     return config;
   });
+  }
+
 
   return api;
 };

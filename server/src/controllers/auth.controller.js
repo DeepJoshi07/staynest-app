@@ -2,10 +2,10 @@ import User from "../models/auth.model.js";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import Session from "../models/session.model.js";
+import cloudinary from "../config/cloudinary.js";
 
 export const register = async (req, res) => {
   const { username, email, password } = req.body;
-  
 
   const alreadyExists = await User.findOne({
     $or: [{ username }, { email }],
@@ -81,16 +81,15 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   const { email, password } = req.body;
-  
 
   const user = await User.findOne({ email });
-  
+
   if (!user) {
     return res.status(400).json({
       message: "User does not exists",
     });
   }
-  
+
   const hashPassword = crypto
     .createHash("sha256")
     .update(password)
@@ -144,7 +143,7 @@ export const login = async (req, res) => {
     sameSite: "strict",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
-  
+
   return res.status(200).json({
     message: "user logged in successfully!",
     user: {
@@ -238,9 +237,26 @@ export const refreshToken = async (req, res) => {
   });
 };
 
-export const updateImage = async(req,res) => {
-  
-}
+export const updateImage = async (req, res) => {
+  const fileBuffer = req.file.buffer;
+  console.log("hello")
+  const result = await new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: "staynest",
+        public_id: `img_${Date.now()}`,
+        resource_type: "image",
+      },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      },
+    );
+    stream.end(fileBuffer)
+  });
+
+  res.status(200).json({ url: result.secure_url });
+};
 // export const logoutAll = async (req, res) => {
 //   const refreshToken = req.cookies.refreshToken;
 
