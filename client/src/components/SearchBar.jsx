@@ -8,12 +8,12 @@ export default function SearchBar({
   return (
     <form
       onSubmit={onSubmit}
-      className={`grid gap-3 rounded-2xl bg-white p-4 shadow-soft ${
+      className={`grid items-end gap-3 rounded-2xl bg-white p-4 shadow-soft ${
         showDates
           ? compact
-            ? "grid-cols-2 md:grid-cols-4"
-            : "grid-cols-2 md:grid-cols-5"
-          : "grid-cols-1 sm:grid-cols-3"
+            ? "grid-cols-2 md:grid-cols-5"
+            : "grid-cols-2 md:grid-cols-6"
+          : "grid-cols-1 sm:grid-cols-4"
       }`}
     >
       {/* Location — full width on mobile, normal on md+ */}
@@ -21,7 +21,13 @@ export default function SearchBar({
         value={filters.location}
         onChange={(e) => onChange("location", e.target.value)}
         placeholder="Location"
-        className={`rounded-xl border px-4 py-2.5 text-slate-800 placeholder:text-slate-400 ${showDates ? "col-span-2 md:col-span-1" : ""}`}
+        className={`w-full rounded-xl border px-4 py-2.5 text-slate-800 placeholder:text-slate-400 ${
+          showDates
+            ? compact
+              ? "col-span-2 md:col-span-1"
+              : "col-span-2 md:col-span-2"
+            : "sm:col-span-2"
+        }`}
         aria-label="Location"
       />
 
@@ -30,7 +36,7 @@ export default function SearchBar({
           <label className="text-xs font-medium text-slate-500">From</label>
           <input
             type="date"
-            className="w-full rounded-xl border border-slate-200 px-3 py-2 text-slate-400"
+            className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-slate-400"
             aria-label="From date"
           />
         </div>
@@ -41,7 +47,7 @@ export default function SearchBar({
           <label className="text-xs font-medium text-slate-500">Till</label>
           <input
             type="date"
-            className="w-full rounded-xl border border-slate-200 px-3 py-2 text-slate-400"
+            className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-slate-400"
             aria-label="Till date"
           />
         </div>
@@ -54,13 +60,13 @@ export default function SearchBar({
         placeholder="Guests"
         type="number"
         min="1"
-        className="rounded-xl border px-4 py-2.5 text-slate-800 placeholder:text-slate-400"
+        className={`w-full rounded-xl border px-4 py-2.5 text-slate-800 placeholder:text-slate-400 ${showDates ? "col-span-2 md:col-span-1" : ""}`}
         aria-label="Guests"
       />
 
       {/* Search button — full width on mobile */}
       <button
-        className={`rounded-xl bg-brand-primary px-4 py-2.5 font-medium text-white hover:bg-brand-dark transition ${showDates ? "col-span-2 md:col-span-1" : ""}`}
+        className={`w-full rounded-xl bg-brand-primary px-4 py-2.5 font-medium text-white hover:bg-brand-dark transition ${showDates ? "col-span-2 md:col-span-1" : ""}`}
       >
         Search
       </button>

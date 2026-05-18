@@ -46,7 +46,7 @@ export default function HomePage() {
             </div>
 
             {/* Search form */}
-            <div className="w-full max-w-3xl">
+            <div className="w-full max-w-7xl">
               <SearchBar
                 filters={filters}
                 showDates={true}
