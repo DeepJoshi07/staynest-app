@@ -27,8 +27,8 @@ export default function Navbar() {
 
   // Sync avatar from user object
   useEffect(() => {
-    if (user?.avatar) setAvatarPreview(user.avatar);
-  }, [user?.avatar]);
+    if (user?.image) setAvatarPreview(user.image);
+  }, [user?.image]);
 
   const handleImageChange = async (e) => {
     const file = e.target.files?.[0];

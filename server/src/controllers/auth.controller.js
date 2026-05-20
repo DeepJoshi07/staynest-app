@@ -74,6 +74,7 @@ export const register = async (req, res) => {
     user: {
       username: user.username,
       email: user.email,
+      image: user.image || ""
     },
     accessToken,
   });
@@ -149,6 +150,7 @@ export const login = async (req, res) => {
     user: {
       username: user.username,
       email: user.email,
+      image:user.image || " "
     },
     accessToken,
   });
@@ -224,6 +226,8 @@ export const refreshToken = async (req, res) => {
   session.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   await session.save();
 
+  const user = await User.findById(req.userId);
+
   res.cookie("refreshToken", newRfreshToken, {
     httpOnly: true,
     secure: true,
@@ -233,13 +237,19 @@ export const refreshToken = async (req, res) => {
 
   return res.status(200).json({
     message: "access token refreshed successfully!",
+    user,
     accessToken,
   });
 };
 
 export const updateImage = async (req, res) => {
   const fileBuffer = req.file.buffer;
-  console.log("hello")
+  
+  const user = await User.findById(req.userId);
+
+  if(!user){
+    return res.status(400).json({message:"User not found!"})
+  }
   const result = await new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       {
@@ -255,7 +265,14 @@ export const updateImage = async (req, res) => {
     stream.end(fileBuffer)
   });
 
-  res.status(200).json({ url: result.secure_url });
+  user.image = result.secure_url;
+  user.save()
+
+  res.status(200).json({ user:{
+    username:user.username,
+    email:user.email,
+    image:user.image
+  } });
 };
 // export const logoutAll = async (req, res) => {
 //   const refreshToken = req.cookies.refreshToken;
