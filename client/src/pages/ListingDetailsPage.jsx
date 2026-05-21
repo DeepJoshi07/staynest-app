@@ -2,6 +2,8 @@ import { Helmet } from "react-helmet-async";
 import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { mockListings, reviews } from "../utils/mockData";
+import "react-datepicker/dist/react-datepicker.css";
+import DatePicker from "react-datepicker";
 
 // const from = "2026-05-14"; // input.value
 // const till = "2026-05-20"; // input.value
@@ -27,8 +29,12 @@ export default function ListingDetailsPage() {
   const [activeImage, setActiveImage] = useState(0);
 
   const handleSubmit = (detail) => {
-    console.log(detail)
-  }
+    const {from,till,people,price} = detail;
+    const newTill = new Date(till).toLocaleDateString("en-US");
+    const newFrom = new Date(from).toLocaleDateString("en-US");
+    detail = {...detail,till:newTill,from:newFrom}
+    console.log(detail);
+  };
 
   return (
     <section className="container-base py-10">
@@ -89,7 +95,7 @@ export default function ListingDetailsPage() {
             </div>
           </div>
         </div>
-        <Reserve listing={listing} onClick={handleSubmit}/>
+        <Reserve listing={listing} onClick={handleSubmit} />
       </div>
     </section>
   );
@@ -115,54 +121,123 @@ const Reviews = ({ review }) => {
   );
 };
 
-const Reserve = ({listing,onClick}) => {
-  const [deatil,setDatail] = useState({
-    price:listing.price,
-    from:"",
-    till:"",
-    people:1
-  })
+const Reserve = ({
+  listing,
+  onClick,
+}) => {
+  const [detail, setDetail] = useState({
+    price: listing.price,
+    from: null,
+    till: null,
+    people: 1,
+  });
 
-  const handlesubmit = () => {
-    onClick(deatil)
+  const bookedDates = (listing.bookedDates || [
+    "2026/05/22",
+    "2026/05/23",
+    "2026/05/24",
+    "2026/05/25",
+    "2026/06/01",
+    "2026/06/02",
+    "2026/06/03",
+  ]).map((d) => new Date(d));
+
+  let maxDateForTill = null;
+  if (detail.from) {
+    const futureDates = bookedDates.filter((d) => d > detail.from);
+    if (futureDates.length > 0) {
+      maxDateForTill = new Date(Math.min(...futureDates));
+    }
   }
+
+  const handleSubmit = () => {
+    if (!detail.from || !detail.till) {
+      alert("Please select both start and end dates.");
+      return;
+    }
+    if (detail.from >= detail.till) {
+      alert("End date must be after start date.");
+      return;
+    }
+    const hasBooked = bookedDates.some(
+      (d) => d >= detail.from && d <= detail.till
+    );
+    if (hasBooked) {
+      alert("Your selected dates include days that are already booked.");
+      return;
+    }
+    onClick(detail);
+  };
+
   return (
-    <aside className="h-fit rounded-2xl bg-white p-5 shadow-soft">
+    <aside className="h-fit rounded-xl bg-white p-5 shadow-soft">
+      <style>{`
+        .react-datepicker-wrapper {
+          width: 100%;
+        }
+        .react-datepicker__day--selected,
+        .react-datepicker__day--keyboard-selected {
+          background-color: #ff385c !important;
+          color: white !important;
+        }
+        .react-datepicker__day--highlighted-custom-1 {
+          background-color: #ffe4e6 !important;
+          color: #ff385c !important;
+          text-decoration: line-through;
+          border-radius: 0.3rem;
+        }
+        .react-datepicker__day--highlighted-custom-1:hover {
+          background-color: #ffe4e6 !important;
+        }
+      `}</style>
       <p className="text-2xl font-semibold">
         ${listing.price}{" "}
         <span className="text-sm font-normal text-slate-500">night</span>
       </p>
-      <div className="mt-4 space-y-3">
-        <div className="space-y-1">
-          <label className="text-xs font-medium text-slate-600">From</label>
-          <input
-            type="date"
-            className="w-full text-slate-400 rounded-xl border px-3 py-2"
-            onChange={(e) => setDatail({...deatil,from:e.target.value})}
-          />
-        </div>
-        <div className="space-y-1">
-          <label className="text-xs font-medium text-slate-600">Till</label>
-          <input
-            type="date"
-            className="w-full text-slate-400 rounded-xl border px-3 py-2"
-            onChange={(e) => setDatail({...deatil,till:e.target.value})}
-          />
-        </div>
+
+      <div className="mt-4 w-full space-y-3">
+        <DatePicker
+          selected={detail.from}
+          onChange={(date) => setDetail({ ...detail, from: date, till: null })}
+          minDate={new Date()}
+          excludeDates={bookedDates}
+          placeholderText="Select start date"
+          wrapperClassName="w-full"
+          highlightDates={[
+            { "react-datepicker__day--highlighted-custom-1": bookedDates },
+          ]}
+          className="w-full rounded-xl border px-3 py-2 text-slate-800"
+        />
+        <DatePicker
+          selected={detail.till}
+          onChange={(date) => setDetail({ ...detail, till: date })}
+          minDate={detail.from || new Date()}
+          maxDate={maxDateForTill}
+          excludeDates={bookedDates}
+          wrapperClassName="w-full"
+          highlightDates={[
+            { "react-datepicker__day--highlighted-custom-1": bookedDates },
+          ]}
+          placeholderText="Select end date"
+          className="w-full rounded-xl border px-3 py-2 text-slate-800"
+        />
         <input
           type="number"
           min="1"
-          onChange={(e) => setDatail({...deatil,people:e.target.value})}
-          // defaultValue="1"
+          value={detail.people}
+          onChange={(e) => setDetail({ ...detail, people: e.target.value })}
+          className="w-full rounded-xl border px-3 py-2 text-slate-800"
           placeholder="For how many people?"
-          className="w-full rounded-xl border px-3 py-2"
         />
       </div>
-      <button className="mt-4 w-full rounded-xl bg-brand-primary py-3 text-white hover:bg-brand-dark"
-        onClick={handlesubmit}
+
+      <button
+        className="mt-4 w-full rounded-xl bg-brand-primary py-3 text-white hover:bg-brand-dark"
+        onClick={handleSubmit}
       >
         Reserve
       </button>
+
       <div className="mt-4 flex items-center gap-3 text-sm">
         <img
           src={listing.host.avatar}
