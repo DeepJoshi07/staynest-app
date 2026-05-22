@@ -1,6 +1,7 @@
 import cloudinary from "../config/cloudinary.js";
 import Listing from "../models/listing.model.js";
 import Review from "../models/review.model.js";
+import Booking from "../models/booked.model.js";
 
 export const allListings = async (req, res) => {
   const listings = await Listing.find();
@@ -9,7 +10,6 @@ export const allListings = async (req, res) => {
   }
   return res.status(200).json(listings);
 };
-// export const myListing = (req, res) => {};
 
 export const newListing = async (req, res) => {
   const {
@@ -59,6 +59,7 @@ export const newListing = async (req, res) => {
     bathrooms,
     description,
     amenities,
+    host:req.userId,
     images: result,
     //rating,reviews,
   });
@@ -142,5 +143,29 @@ export const listingDetail = async(req, res) => {
 };
 
 export const bookListing = async(req, res) => {
-    
+    const {price,from,till,people,listingId} = req.body;
+    //listingId, guestId, from, till, payment, reserved, reservedTill, expireAt, people, price
+
+    const booking = await Booking.create({
+      price,
+      from,
+      till,
+      people,
+      expireAt:till,
+      listingId,
+      guestId:req.userId,
+      payment:"pendding",
+      reserved:true,
+      reservedTill:Date.now() + 2 * 24 * 60 * 60 * 1000
+    });
+
+    if(!booking){
+      return res.status(500).json({
+        message:"internal server error"
+      })
+    }
+
+    return res.status(200).json({
+      message:"Your booking has reserved. Please make payment to confirm!"
+    })
 };

@@ -12,7 +12,6 @@ export default function ImageUploader({ onChange }) {
     }));
     setPreviews(p => [...p,...localUrls]);
     onChange(files);
-    console.log(files)
   };
 
   return (

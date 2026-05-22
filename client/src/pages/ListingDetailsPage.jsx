@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { mockListings, reviews } from "../utils/mockData";
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "react-datepicker";
+import { useListing } from "../context/ListingContextProvider";
 
 // const from = "2026-05-14"; // input.value
 // const till = "2026-05-20"; // input.value
@@ -21,6 +22,7 @@ import DatePicker from "react-datepicker";
 // console.log(diffDays);
 
 export default function ListingDetailsPage() {
+  const {bookListing} = useListing()
   const { id } = useParams();
   const listing = useMemo(
     () => mockListings.find((item) => item.id === id) || mockListings[0],
@@ -28,12 +30,21 @@ export default function ListingDetailsPage() {
   );
   const [activeImage, setActiveImage] = useState(0);
 
-  const handleSubmit = (detail) => {
+  const handleSubmit = async(detail) => {
     const {from,till,people,price} = detail;
-    const newTill = new Date(till).toLocaleDateString("en-US");
-    const newFrom = new Date(from).toLocaleDateString("en-US");
-    detail = {...detail,till:newTill,from:newFrom}
-    console.log(detail);
+    // const newTill = new Date(till).toLocaleDateString("en-US");
+    // const newFrom = new Date(from).toLocaleDateString("en-US");
+    // detail = {...detail,till:newTill,from:newFrom}
+    const formData = new FormData()
+    formData.append("from",from)
+    formData.append("till",till)
+    formData.append("people",people)
+    formData.append("price",price)
+    // formData.append("listingId",listing._id)
+    const result = await bookListing(formData);
+
+    // console.log(detail);
+    
   };
 
   return (
