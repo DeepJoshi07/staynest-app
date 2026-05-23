@@ -1,25 +1,67 @@
 import { Helmet } from "react-helmet-async";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import ImageUploader from "../components/ImageUploader";
 import { amenitiesList } from "../utils/mockData";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useListing } from "../context/ListingContextProvider";
 
 export default function ListingFormPage({ mode = "add" }) {
   const navigate = useNavigate();
-  const { register, handleSubmit, setValue,control } = useForm();
-  const [photos, setPhotos] = useState(null);
+  const { id } = useParams();
+  const { addNewListing, editListing, getListingDetail } = useListing();
+  const { register, handleSubmit, setValue, control, reset } = useForm();
 
-  const handleImages = (images) => {
-    setPhotos(images);
-    console.log(images);
-    setValue("images", photos);
-  };
+  useEffect(() => {
+    if (mode === "edit" && id) {
+      const fetchListing = async () => {
+        const data = await getListingDetail(id);
+        if (data && Object.keys(data).length > 0) {
+          reset({
+            title: data.title,
+            description: data.description,
+            location: data.location,
+            price: data.price,
+            guests: data.guests,
+            bedrooms: data.bedrooms,
+            bathrooms: data.bathrooms,
+            amenities: data.amenities || [],
+          });
+        }
+      };
+      fetchListing();
+    }
+  }, [mode, id, getListingDetail, reset]);
 
   const handleSubmitForm = async (data) => {
-    console.log(data);
-    console.log(data);
+    const formData = new FormData();
+    if (mode === "edit" && id) {
+      formData.append("id", id);
+    }
+    formData.append("title",data.title)
+    formData.append("description",data.description)
+    formData.append("location",data.location)
+    formData.append("price",data.price)
+    formData.append("guests",data.guests)
+    formData.append("bedrooms",data.bedrooms)
+    formData.append("bathrooms",data.bathrooms)
+
+    if (data.amenities) {
+      data.amenities.forEach(a => formData.append("amenities",a))
+    }
+
+    if (data.images) {
+      for(let i = 0;i < data.images.length;i++){
+        formData.append("images",data.images[i]);
+      }
+    }
+    
+    if (mode === "edit") {
+      await editListing(formData);
+    } else {
+      await addNewListing(formData);
+    }
     toast.success(`Listing ${mode === "add" ? "created" : "updated"}`);
     navigate("/dashboard");
   };

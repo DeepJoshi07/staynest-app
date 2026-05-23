@@ -10,7 +10,7 @@ export default function ListingCard({ listing }) {
         aria-label={`View details for ${listing.title}`}
       >
         <img
-          src={listing.images[0]}
+          src={listing.images[0].imageUrl}
           alt={listing.title}
           className="h-56 w-full object-cover transition duration-300 group-hover:scale-105"
           loading="lazy"

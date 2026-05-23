@@ -4,8 +4,10 @@ import { Link, useNavigate } from "react-router-dom";
 import ListingCard from "../components/ListingCard";
 import SearchBar from "../components/SearchBar";
 import { mockListings } from "../utils/mockData";
+import { useListing } from "../context/ListingContextProvider";
 
 export default function HomePage() {
+  const {listings} = useListing()
   const navigate = useNavigate();
   const [filters, setFilters] = useState({ location: "", guests: "" });
 
@@ -74,8 +76,8 @@ export default function HomePage() {
       <section className="container-base py-8 sm:py-12">
         <h2 className="mb-5 text-xl font-semibold sm:text-2xl">Featured stays</h2>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {mockListings.map((listing) => (
-            <ListingCard key={listing.id} listing={listing} />
+          {listings.map((listing) => (
+            <ListingCard key={listing._id} listing={listing} />
           ))}
         </div>
       </section>

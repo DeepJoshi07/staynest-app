@@ -22,14 +22,15 @@ export const newListing = async (req, res) => {
     bathrooms,
     amenities,
   } = req.body;
-
-  if (!req.files || req.files.listing === 0) {
+ 
+  if (!req.files || req.files.length === 0) {
     return res.status(400).json({
       message: "No images privided!",
     });
   }
+
   const uploadPromises = req.files.map((file, index) => {
-    return Promise((resolve, reject) => {
+    return new  Promise((resolve, reject) => {
       const publicId = `img_${Date.now()}_${index}`;
       const stream = cloudinary.uploader.upload_stream(
         {
@@ -47,9 +48,9 @@ export const newListing = async (req, res) => {
       stream.end(file.buffer);
     });
   });
-
+ 
   const result = await Promise.all(uploadPromises);
-
+ 
   const listing = await Listing.create({
     title,
     guests,
@@ -67,7 +68,8 @@ export const newListing = async (req, res) => {
   if (!listing) {
     return res.status(500).json({ message: "internal server error!" });
   }
-  return res.status(200).json(listing);
+
+  return res.status(200).json({listing});
 };
 
 export const editListing = async (req, res) => {
@@ -82,9 +84,9 @@ export const editListing = async (req, res) => {
     amenities,
   } = req.body;
 
-  if (req.files || req.files.listing > 0) {
+  if (req.files || req.files.length > 0) {
     const uploadPromises = req.files.map((file, index) => {
-      return Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
           {
             folder: "staynest",

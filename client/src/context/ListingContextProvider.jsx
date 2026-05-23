@@ -46,23 +46,27 @@ const ListingContextProvider = ({ children }) => {
 
   const addNewListing = useCallback(async (formData) => {
     try {
-      const result = await api.post("/listing/add", formData);
-      if (result) {
-        return result.data;
-      } else {
-        return {};
-      }
+      const res = await api.post("/listing/add", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      console.log(res);
+      // if (data) {
+      //   setListings((p) => ([...p,data]))
+      // }
+      // console.log(data)
     } catch (error) {}
   }, []);
 
   const editListing = useCallback(async (formData) => {
     try {
-      const data = await api.post("/listing/edit", formData);
-      if (result) {
-        return result.data;
-      } else {
-        return {};
+      const { data } = await api.post("/listing/edit", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      console.log(data);
+      if (data) {
+        setListings((p) => [...p, data]);
       }
+      console.log(data);
     } catch (error) {}
   }, []);
 
@@ -85,12 +89,13 @@ const ListingContextProvider = ({ children }) => {
   const values = useMemo(
     () => ({
       getAllListings,
+      getListingDetail,
       listings,
       addNewListing,
       editListing,
       bookListing,
     }),
-    [getAllListings, listings, addNewListing, editListing, bookListing],
+    [getAllListings, getListingDetail, listings, addNewListing, editListing, bookListing],
   );
   return (
     <ListingContext.Provider value={values}>{children}</ListingContext.Provider>
