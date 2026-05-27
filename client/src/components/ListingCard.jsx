@@ -5,7 +5,7 @@ export default function ListingCard({ listing }) {
   return (
     <article className="group overflow-hidden rounded-2xl bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-soft">
       <Link
-        to={`/listings/${listing.id}`}
+        to={`/listings/${listing._id}`}
         className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
         aria-label={`View details for ${listing.title}`}
       >

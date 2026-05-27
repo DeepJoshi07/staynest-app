@@ -12,7 +12,6 @@ const SignupPage = lazy(() => import("./pages/SignupPage"));
 const ListingsPage = lazy(() => import("./pages/ListingsPage"));
 const ListingDetailsPage = lazy(() => import("./pages/ListingDetailsPage"));
 const ListingFormPage = lazy(() => import("./pages/ListingFormPage"));
-const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 const MyListingsPage = lazy(() => import("./pages/MyListingsPage"));
 const MyBookingsPage = lazy(() => import("./pages/MyBookingsPage"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
@@ -47,14 +46,6 @@ function App() {
               }
             />
             <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <DashboardPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
               path="/dashboard/listings"
               element={
                 <ProtectedRoute>
@@ -63,7 +54,7 @@ function App() {
               }
             />
             <Route
-              path="/dashboard/bookings"
+              path="/dashboard/mybookings"
               element={
                 <ProtectedRoute>
                   <MyBookingsPage />

@@ -63,7 +63,7 @@ export default function ListingFormPage({ mode = "add" }) {
       await addNewListing(formData);
     }
     toast.success(`Listing ${mode === "add" ? "created" : "updated"}`);
-    navigate("/dashboard");
+    navigate("/dashboard/listings");
   };
 
   return (

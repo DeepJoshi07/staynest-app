@@ -1,8 +1,14 @@
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
-import { mockListings } from "../utils/mockData";
+import { useListing } from "../context/ListingContextProvider";
+import { useAuth } from "../context/AuthContext";
 
 export default function MyListingsPage() {
+  const {listings} = useListing();
+  const {user} = useAuth()
+
+  const myListings = listings.filter((l) => l.host === user._id)
+
   return (
     <section className="container-base py-10">
       <Helmet>
@@ -20,13 +26,13 @@ export default function MyListingsPage() {
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {mockListings.map((listing) => (
+        {myListings.map((listing) => (
           <article
-            key={listing.id}
+            key={listing._id}
             className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-soft"
           >
             <img
-              src={listing.images[0]}
+              src={listing.images[0].imageUrl}
               alt={listing.title}
               className="h-48 w-full object-cover"
               loading="lazy"
@@ -46,13 +52,13 @@ export default function MyListingsPage() {
               </div>
               <div className="flex gap-2 pt-2">
                 <Link
-                  to={`/host/edit/${listing.id}`}
+                  to={`/host/edit/${listing._id}`}
                   className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-100"
                 >
                   Edit
                 </Link>
                 <Link
-                  to={`/listings/${listing.id}`}
+                  to={`/listings/${listing._id}`}
                   className="rounded-lg bg-slate-900 px-3 py-1.5 text-sm text-white hover:bg-slate-700"
                 >
                   View

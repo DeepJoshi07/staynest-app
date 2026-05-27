@@ -1,8 +1,21 @@
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
-import { mockBookings, mockListings } from "../utils/mockData";
+import { useListing } from "../context/ListingContextProvider";
+import { useEffect, useState } from "react";
 
 export default function MyBookingsPage() {
+  const [myBookings, setMyBookings] = useState([]);
+
+  const { getMyBookings } = useListing();
+
+  useEffect(() => {
+    const data = async () => {
+      const bookings = await getMyBookings();
+      setMyBookings(bookings);
+    };
+    data();
+  }, []);
+
   return (
     <section className="container-base py-10">
       <Helmet>
@@ -20,48 +33,48 @@ export default function MyBookingsPage() {
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {mockBookings.map((booking) => {
-          const listing = mockListings.find(
-            (item) => item.id === booking.listingId,
-          );
-          const image = listing?.images?.[0];
-          const location = listing?.location || "Location not available";
-          const price = listing?.price;
-
+        {myBookings.map((booking) => {
           return (
             <article
-              key={booking.id}
+              key={booking._id}
               className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-soft"
             >
               <img
-                src={image}
-                alt={booking.listingTitle}
+                src={booking.listingId?.images?.[0]?.imageUrl || ""}
+                alt={booking.listingId?.title || "Listing"}
                 className="h-48 w-full object-cover"
                 loading="lazy"
               />
               <div className="space-y-2 p-4">
-                <h2 className="font-semibold">{booking.listingTitle}</h2>
-                <p className="text-sm text-slate-500">{location}</p>
-                <p className="text-sm text-slate-600">Dates: {booking.dates}</p>
+                <h2 className="font-semibold">
+                  {booking.listingId?.title || "Unknown Listing"}
+                </h2>
+                <p className="text-sm text-slate-500">
+                  {booking.listingId?.location}
+                </p>
                 <p className="text-sm text-slate-600">
-                  Guests: {booking.guests}
+                  Date: {new Date(booking.from).toLocaleDateString()} to{" "}
+                  {new Date(booking.till).toLocaleDateString()}
+                </p>
+                <p className="text-sm text-slate-600">
+                  Guests: {booking.people}
                 </p>
                 <div className="flex items-center justify-between pt-1">
                   <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-700">
-                    {booking.status}
+                    {booking.payment?.[0] || booking.payment}
                   </span>
-                  {price ? (
+                  {booking.price ? (
                     <p className="text-sm">
                       <span className="font-medium text-slate-900">
-                        ${price}
+                        ${booking.price}
                       </span>
                       <span className="text-slate-500"> / night</span>
                     </p>
                   ) : null}
                 </div>
-                {listing ? (
+                {booking.listingId ? (
                   <Link
-                    to={`/listings/${listing.id}`}
+                    to={`/listings/${booking.listingId._id}`}
                     className="inline-block rounded-lg bg-slate-900 px-3 py-1.5 text-sm text-white hover:bg-slate-700"
                   >
                     View Stay

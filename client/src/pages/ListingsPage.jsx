@@ -4,6 +4,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import ListingCard from "../components/ListingCard";
 import LoaderSkeleton from "../components/LoaderSkeleton";
 import useListings from "../hooks/useListings";
+import { useListing } from "../context/ListingContextProvider";
 
 export default function ListingsPage() {
   const [filters, setFilters] = useState({
@@ -13,8 +14,9 @@ export default function ListingsPage() {
   });
   const [page, setPage] = useState(1);
   const [searchParams] = useSearchParams();
-  const { listings, loading, pages } = useListings(filters, page, 6);
-
+  const { listings} = useListing();
+  const loading = !listings === true ? true :false;
+  
   useEffect(() => {
     setFilters((prev) => ({
       ...prev,
@@ -71,20 +73,10 @@ export default function ListingsPage() {
         <>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {listings.map((listing) => (
-              <ListingCard key={listing.id} listing={listing} />
+              <ListingCard key={listing._id} listing={listing} />
             ))}
           </div>
-          <div className="mt-8 flex justify-center gap-2">
-            {Array.from({ length: pages || 1 }).map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setPage(idx + 1)}
-                className={`h-9 w-9 rounded-full ${page === idx + 1 ? "bg-brand-primary text-white" : "bg-white"}`}
-              >
-                {idx + 1}
-              </button>
-            ))}
-          </div>
+          
         </>
       )}
     </section>

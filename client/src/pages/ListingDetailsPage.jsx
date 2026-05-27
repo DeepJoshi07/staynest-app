@@ -1,10 +1,12 @@
 import { Helmet } from "react-helmet-async";
-import { useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { mockListings, reviews } from "../utils/mockData";
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "react-datepicker";
 import { useListing } from "../context/ListingContextProvider";
+import toast from "react-hot-toast";
+import UserImage from "../assets/user.png"
 
 // const from = "2026-05-14"; // input.value
 // const till = "2026-05-20"; // input.value
@@ -22,32 +24,54 @@ import { useListing } from "../context/ListingContextProvider";
 // console.log(diffDays);
 
 export default function ListingDetailsPage() {
-  const {bookListing} = useListing()
+
+  const { bookListing, getListingDetail } = useListing();
+  const navigate = useNavigate();
+  const [listing, setListing] = useState(null);
   const { id } = useParams();
-  const listing = useMemo(
-    () => mockListings.find((item) => item.id === id) || mockListings[0],
-    [id],
-  );
+
+  useEffect(() => {
+    const listDeatil = async () => {
+      const data = await getListingDetail(id);
+      console.log(data)
+      setListing(data);
+    };
+    listDeatil();
+  }, [id, getListingDetail]);
+
+
   const [activeImage, setActiveImage] = useState(0);
 
-  const handleSubmit = async(detail) => {
-    const {from,till,people,price} = detail;
-    // const newTill = new Date(till).toLocaleDateString("en-US");
-    // const newFrom = new Date(from).toLocaleDateString("en-US");
-    // detail = {...detail,till:newTill,from:newFrom}
-    const formData = new FormData()
-    formData.append("from",from)
-    formData.append("till",till)
-    formData.append("people",people)
-    formData.append("price",price)
-    // formData.append("listingId",listing._id)
-    const result = await bookListing(formData);
-
-    // console.log(detail);
+  const handleSubmit = async (detail) => {
+    const { from, till, people, price } = detail;
     
+    const payload = {
+      from,
+      till,
+      people,
+      price,
+      listingId: listing._id
+    };
+    const result = await bookListing(payload);
+
+    if (result) {
+      toast.success("Listing reserved successfully!");
+      navigate("/dashboard/mybookings");
+    } else {
+      toast.error("listing not reserved!");
+    }
   };
 
+  if (!listing || !listing._id) {
+    return (
+      <section className="container-base py-10">
+        <div>Loading...</div>
+      </section>
+    );
+  }
+
   return (
+  
     <section className="container-base py-10">
       <Helmet>
         <title>{listing.title} | Staynest</title>
@@ -56,37 +80,39 @@ export default function ListingDetailsPage() {
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           <img
-            src={listing.images[activeImage]}
+            src={listing.images?.[activeImage]?.imageUrl}
             alt={listing.title}
             className="h-80 w-full rounded-2xl object-cover"
           />
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {listing.images.map((image, idx) => (
-              <button
-                key={image}
-                onClick={() => setActiveImage(idx)}
-                className="overflow-hidden rounded-xl"
-              >
-                <img
-                  src={image}
-                  alt={`Preview ${idx + 1}`}
-                  className="h-20 w-full object-cover"
-                />
-              </button>
-            ))}
+            {listing.images &&
+              listing.images.map((image, idx) => (
+                <button
+                  key={image.publicId || idx}
+                  onClick={() => setActiveImage(idx)}
+                  className="overflow-hidden rounded-xl"
+                >
+                  <img
+                    src={image.imageUrl}
+                    alt={`Preview ${idx + 1}`}
+                    className="h-20 w-full object-cover"
+                  />
+                </button>
+              ))}
           </div>
           <p>{listing.description}</p>
           <div>
             <h3 className="mb-2 font-semibold">Amenities</h3>
             <div className="flex flex-wrap gap-2">
-              {listing.amenities.map((a) => (
-                <span
-                  key={a}
-                  className="rounded-full bg-slate-100 px-3 py-1 text-sm"
-                >
-                  {a}
-                </span>
-              ))}
+              {listing.amenities &&
+                listing.amenities.map((a) => (
+                  <span
+                    key={a}
+                    className="rounded-full bg-slate-100 px-3 py-1 text-sm"
+                  >
+                    {a}
+                  </span>
+                ))}
             </div>
           </div>
           <div className="rounded-2xl bg-white p-4 shadow-sm">
@@ -132,10 +158,7 @@ const Reviews = ({ review }) => {
   );
 };
 
-const Reserve = ({
-  listing,
-  onClick,
-}) => {
+const Reserve = ({ listing, onClick }) => {
   const [detail, setDetail] = useState({
     price: listing.price,
     from: null,
@@ -143,15 +166,17 @@ const Reserve = ({
     people: 1,
   });
 
-  const bookedDates = (listing.bookedDates || [
-    "2026/05/22",
-    "2026/05/23",
-    "2026/05/24",
-    "2026/05/25",
-    "2026/06/01",
-    "2026/06/02",
-    "2026/06/03",
-  ]).map((d) => new Date(d));
+  const bookedDates = (
+    listing.bookedDates || [
+      "2026/05/22",
+      "2026/05/23",
+      "2026/05/24",
+      "2026/05/25",
+      "2026/06/01",
+      "2026/06/02",
+      "2026/06/03",
+    ]
+  ).map((d) => new Date(d));
 
   let maxDateForTill = null;
   if (detail.from) {
@@ -171,7 +196,7 @@ const Reserve = ({
       return;
     }
     const hasBooked = bookedDates.some(
-      (d) => d >= detail.from && d <= detail.till
+      (d) => d >= detail.from && d <= detail.till,
     );
     if (hasBooked) {
       alert("Your selected dates include days that are already booked.");
@@ -251,11 +276,11 @@ const Reserve = ({
 
       <div className="mt-4 flex items-center gap-3 text-sm">
         <img
-          src={listing.host.avatar}
-          alt={listing.host.name}
+          src={listing.host?.image || UserImage}
+          alt={listing.host?.username || "unknown"}
           className="h-8 w-8 rounded-full"
         />
-        Hosted by {listing.host.name}
+        Hosted by {listing.host?.username}
       </div>
     </aside>
   );

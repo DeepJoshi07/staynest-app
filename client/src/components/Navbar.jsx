@@ -124,7 +124,7 @@ export default function Navbar() {
           {accessToken ? (
             <>
               <NavLink
-                to="/dashboard"
+                to="/dashboard/mybookings"
                 className="rounded-full px-3 py-2 text-sm hover:bg-slate-100"
               >
                 My Bookings

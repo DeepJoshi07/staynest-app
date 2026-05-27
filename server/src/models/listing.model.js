@@ -59,7 +59,7 @@ const listingSchema = new mongoose.Schema(
     },
     host: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "users",
+      ref: "user",
       required: [true, "Host is required"],
     },
     reviews: [

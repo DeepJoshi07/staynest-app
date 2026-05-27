@@ -5,6 +5,7 @@ import {
   bookListing,
   editListing,
   listingDetail,
+  myBookings,
   // myListing,
   newListing,
 } from "../controllers/listings.controller.js";
@@ -17,7 +18,8 @@ router.get("/all-listings", wrapper(allListings));
 // router.get("/my/listings",authUser,wrapper(myListing));
 router.post("/add", authUser, upload.array("images", 5), wrapper(newListing));
 router.post("/edit", authUser, upload.array("images", 5), wrapper(editListing));
-router.post("/detail", wrapper(listingDetail));
+router.get("/detail", wrapper(listingDetail));
 router.post("/booked", authUser, wrapper(bookListing));
+router.get("/my-bookings", authUser, wrapper(myBookings));
 
 export default router;

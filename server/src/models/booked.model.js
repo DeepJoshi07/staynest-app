@@ -9,7 +9,7 @@ const bookedSchema = new mongoose.Schema(
     },
     guestId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "users",
+      ref: "user",
       required: [true, "GuestId is required"],
     },
     from: {

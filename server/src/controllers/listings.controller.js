@@ -4,7 +4,7 @@ import Review from "../models/review.model.js";
 import Booking from "../models/booked.model.js";
 
 export const allListings = async (req, res) => {
-  const listings = await Listing.find();
+  const listings = await Listing.find().populate("host");
   if (!listings) {
     return res.status(500).json({ message: "internal server error!" });
   }
@@ -22,7 +22,7 @@ export const newListing = async (req, res) => {
     bathrooms,
     amenities,
   } = req.body;
- 
+
   if (!req.files || req.files.length === 0) {
     return res.status(400).json({
       message: "No images privided!",
@@ -30,7 +30,7 @@ export const newListing = async (req, res) => {
   }
 
   const uploadPromises = req.files.map((file, index) => {
-    return new  Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const publicId = `img_${Date.now()}_${index}`;
       const stream = cloudinary.uploader.upload_stream(
         {
@@ -39,18 +39,19 @@ export const newListing = async (req, res) => {
         },
         (error, result) => {
           if (error) reject(error);
-          else resolve({
-                imageUrl:result.secure_url,
-                publicId:result.public_id
-          });
+          else
+            resolve({
+              imageUrl: result.secure_url,
+              publicId: result.public_id,
+            });
         },
       );
       stream.end(file.buffer);
     });
   });
- 
+
   const result = await Promise.all(uploadPromises);
- 
+
   const listing = await Listing.create({
     title,
     guests,
@@ -60,7 +61,7 @@ export const newListing = async (req, res) => {
     bathrooms,
     description,
     amenities,
-    host:req.userId,
+    host: req.userId,
     images: result,
     //rating,reviews,
   });
@@ -69,7 +70,7 @@ export const newListing = async (req, res) => {
     return res.status(500).json({ message: "internal server error!" });
   }
 
-  return res.status(200).json({listing});
+  return res.status(200).json({ listing });
 };
 
 export const editListing = async (req, res) => {
@@ -82,7 +83,10 @@ export const editListing = async (req, res) => {
     bedrooms,
     bathrooms,
     amenities,
+    id,
   } = req.body;
+
+  let result;
 
   if (req.files || req.files.length > 0) {
     const uploadPromises = req.files.map((file, index) => {
@@ -94,80 +98,101 @@ export const editListing = async (req, res) => {
           },
           (error, result) => {
             if (error) reject(error);
-            else resolve({
-                imageUrl:result.secure_url,
-                publicId:result.public_id
-          });
+            else
+              resolve({
+                imageUrl: result.secure_url,
+                publicId: result.public_id,
+              });
           },
         );
         stream.end(file.buffer);
       });
     });
-    const result = await Promise.all(uploadPromises);
+    result = await Promise.all(uploadPromises);
   }
 
-  const listing = await Listing.findByIdAndUpdate(req.userId,{
-    title,
-    guests,
-    location,
+  const listing = await Listing.findByIdAndUpdate(
+    id,
+    {
+      title,
+      guests,
+      location,
+      price,
+      bedrooms,
+      bathrooms,
+      description,
+      amenities,
+      ...(result !== null && result.legnth > 0 && { images: result }),
+      //rating,reviews,
+    },
+    { returnDocument: "after" },
+  );
+
+  if (!listing) {
+    return res.status(500).json({
+      message: "internal server error!",
+    });
+  }
+
+  return res.status(200).json({
+    message: "listing updated successfully!",
+    listing,
+  });
+};
+
+export const listingDetail = async (req, res) => {
+  const  id  = req.query.id;
+  const listing = await Listing.findById(id);
+
+  if (!listing) {
+    return res.status(400).json({
+      message: "listing not found!",
+    });
+  }
+
+  return res.status(200).json({listing});
+};
+
+export const bookListing = async (req, res) => {
+  const { price, from, till, people, listingId } = req.body;
+  //listingId, guestId, from, till, payment, reserved, reservedTill, expireAt, people, price
+  console.log("hello")
+  const booking = await Booking.create({
     price,
-    bedrooms,
-    bathrooms,
-    description,
-    amenities,
-    ...(result.legnth > 0 && {images:result})
-    //rating,reviews,
+    from,
+    till,
+    people,
+    expireAt: till,
+    listingId,
+    guestId: req.userId,
+    payment: "pendding",
+    reserved: true,
+    reservedTill: Date.now() + 2 * 24 * 60 * 60 * 1000,
   });
 
-  if(!listing){
-        return res.status(500).json({
-            message:"internal server error!"
-        })
-    }
-
-    return res.status(200).json({
-        message:"listing updated successfully!",
-        listing
-    })
-};
-export const listingDetail = async(req, res) => {
-    const {id} = req.body;
-
-    const listing = await Listing.findById(id);
-
-    if(!listing){
-        return res.status(400).json({
-            message:"listing not found!"
-        })
-    }
-
-    return res.status(200).json(listing)
-};
-
-export const bookListing = async(req, res) => {
-    const {price,from,till,people,listingId} = req.body;
-    //listingId, guestId, from, till, payment, reserved, reservedTill, expireAt, people, price
-
-    const booking = await Booking.create({
-      price,
-      from,
-      till,
-      people,
-      expireAt:till,
-      listingId,
-      guestId:req.userId,
-      payment:"pendding",
-      reserved:true,
-      reservedTill:Date.now() + 2 * 24 * 60 * 60 * 1000
+  if (!booking) {
+    return res.status(500).json({
+      message: "internal server error",
     });
+  }
 
-    if(!booking){
-      return res.status(500).json({
-        message:"internal server error"
-      })
-    }
+  return res.status(200).json({
+    message: "Your booking has reserved. Please make payment to confirm!",
+  });
+};
 
+export const myBookings = async (req, res) => {
+  const id = req.userId;
+  
+  const bookings = await Booking.find({
+    guestId: id,
+  }).populate("listingId");
+
+  if(!bookings){
     return res.status(200).json({
-      message:"Your booking has reserved. Please make payment to confirm!"
+      message:"no bookings found!"
     })
+  }
+
+  return res.status(200).json({bookings})
 };

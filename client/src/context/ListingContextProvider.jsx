@@ -8,21 +8,24 @@ import React, {
 } from "react";
 import { UseApi } from "./UseApi";
 import toast from "react-hot-toast";
+import { useAuth } from "./AuthContext";
 
 export const ListingContext = createContext(null);
 
 export const useListing = () => useContext(ListingContext);
 
 const ListingContextProvider = ({ children }) => {
+
   const api = UseApi();
 
   const [listings, setListings] = useState([]);
 
   const getAllListings = useCallback(async () => {
     try {
-      const data = await api.get("/listing/all-listings");
+      const {data} = await api.get("/listing/all-listings");
       if (data) {
-        setListings(data.data);
+        setListings(data);
+        console.log(data)
       }
     } catch (error) {
       toast.error("fetching listing error");
@@ -32,9 +35,12 @@ const ListingContextProvider = ({ children }) => {
 
   const getListingDetail = useCallback(async (id) => {
     try {
-      const data = await api.post("/listing/detail", { id });
-      if (data) {
-        return data.data;
+      console.log(id)
+      const {data} = await api.get("/listing/detail", { params:{id} });
+      
+      if (data.listing) {
+        console.log(data)
+        return data.listing;
       } else {
         return {};
       }
@@ -62,25 +68,36 @@ const ListingContextProvider = ({ children }) => {
       const { data } = await api.post("/listing/edit", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      console.log(data);
-      if (data) {
-        setListings((p) => [...p, data]);
+      if (data.listing) {
+        setListings(prev => prev.map(l => l._id === data.listing._id?data.listing :l));
       }
-      console.log(data);
     } catch (error) {}
   }, []);
 
   const bookListing = useCallback(async (formData) => {
     try {
-      console.log(formData);
-      return;
       const result = await api.post("/listing/booked", formData);
+      console.log(result)
       if (result) {
         return result.data;
       } else {
         return {};
       }
     } catch (error) {}
+  }, []);
+
+  const getMyBookings = useCallback(async () => {
+    try {
+      const {data} = await api.get("/listing/my-bookings");
+      if (data.bookings.length > 0) {
+        return data.bookings;
+      }else{
+        return []
+      }
+    } catch (error) {
+      toast.error("fetching booking error");
+      console.log("fetching booking Error", error);
+    }
   }, []);
 
   useEffect(() => {
@@ -94,8 +111,17 @@ const ListingContextProvider = ({ children }) => {
       addNewListing,
       editListing,
       bookListing,
+      getMyBookings
     }),
-    [getAllListings, getListingDetail, listings, addNewListing, editListing, bookListing],
+    [
+      getAllListings,
+      getListingDetail,
+      listings,
+      getMyBookings,
+      addNewListing,
+      editListing,
+      bookListing,
+    ],
   );
   return (
     <ListingContext.Provider value={values}>{children}</ListingContext.Provider>
