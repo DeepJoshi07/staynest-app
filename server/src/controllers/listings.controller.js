@@ -88,8 +88,22 @@ export const editListing = async (req, res) => {
 
   let result;
 
+  const oldListing = await Listing.findById(id);
+
+  if(!oldListing){
+    return res.status(400).json({
+      message:"listing not found!"
+    })
+  }
+
+  const publicIds = oldListing.images.map((img) => img.imageUrl);
+
   if (req.files || req.files.length > 0) {
-    const uploadPromises = req.files.map((file, index) => {
+    try {
+      const result = await cloudinary.api.delete_derived_resources(publicIds,{
+        resourcw_type:'image'
+      })
+      const uploadPromises = req.files.map((file, index) => {
       return new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
           {
@@ -109,6 +123,10 @@ export const editListing = async (req, res) => {
       });
     });
     result = await Promise.all(uploadPromises);
+    } catch (error) {
+      
+    }
+    
   }
 
   const listing = await Listing.findByIdAndUpdate(
@@ -122,7 +140,7 @@ export const editListing = async (req, res) => {
       bathrooms,
       description,
       amenities,
-      ...(result !== null && result.legnth > 0 && { images: result }),
+      ...(result !== null && result.length > 0 && { images: result }),
       //rating,reviews,
     },
     { returnDocument: "after" },
@@ -142,7 +160,7 @@ export const editListing = async (req, res) => {
 
 export const listingDetail = async (req, res) => {
   const  id  = req.query.id;
-  const listing = await Listing.findById(id);
+  const listing = await Listing.findById(id).populate("host");
 
   if (!listing) {
     return res.status(400).json({
@@ -196,3 +214,17 @@ export const myBookings = async (req, res) => {
 
   return res.status(200).json({bookings})
 };
+
+export const deleteListing = async(req,res) => {
+  const id = req.query.id;
+
+  const listing = await Listing.findByIdAndDelete(id);
+
+  if(!listing){
+    return res.status(400).json({
+      message:"Listing not found!"
+    })
+  }
+
+  return res.status(200).json({listing})
+}

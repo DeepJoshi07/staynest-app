@@ -1,0 +1,24 @@
+const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    mode: "payment",
+    line_items: [
+      {
+        price_data: {
+          currency: ,
+          product_data: {
+            name: ,
+            description: ,
+            images: ,
+          },
+          // Stripe expects amount in the smallest currency unit (cents)
+          unit_amount: Math.round(booking.price * nights * 100),
+        },
+        quantity: 1,
+      },
+    ],
+    metadata: {
+      bookingId: booking._id.toString(),
+    },
+    success_url: `${clientBaseUrl}/dashboard/mybookings?payment=success`,
+    cancel_url: `${clientBaseUrl}/dashboard/mybookings?payment=cancelled`,
+  });

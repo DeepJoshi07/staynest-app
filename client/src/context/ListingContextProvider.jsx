@@ -25,7 +25,6 @@ const ListingContextProvider = ({ children }) => {
       const {data} = await api.get("/listing/all-listings");
       if (data) {
         setListings(data);
-        console.log(data)
       }
     } catch (error) {
       toast.error("fetching listing error");
@@ -35,11 +34,9 @@ const ListingContextProvider = ({ children }) => {
 
   const getListingDetail = useCallback(async (id) => {
     try {
-      console.log(id)
       const {data} = await api.get("/listing/detail", { params:{id} });
       
       if (data.listing) {
-        console.log(data)
         return data.listing;
       } else {
         return {};
@@ -56,10 +53,6 @@ const ListingContextProvider = ({ children }) => {
         headers: { "Content-Type": "multipart/form-data" },
       });
       console.log(res);
-      // if (data) {
-      //   setListings((p) => ([...p,data]))
-      // }
-      // console.log(data)
     } catch (error) {}
   }, []);
 
@@ -69,9 +62,22 @@ const ListingContextProvider = ({ children }) => {
         headers: { "Content-Type": "multipart/form-data" },
       });
       if (data.listing) {
-        setListings(prev => prev.map(l => l._id === data.listing._id?data.listing :l));
+        setListings(prev => prev.map(l => l._id === data.listing._id ? data.listing : l));
       }
     } catch (error) {}
+  }, []);
+
+  const deleteListing = useCallback(async (listingId) => {
+    try {
+      await api.delete("/listing/delete", { params: { id: listingId } });
+      setListings(prev => prev.filter(l => l._id !== listingId));
+      toast.success("Listing deleted successfully!");
+      return true;
+    } catch (error) {
+      toast.error("Failed to delete listing.");
+      console.log("delete listing error", error);
+      return false;
+    }
   }, []);
 
   const bookListing = useCallback(async (formData) => {
@@ -100,9 +106,69 @@ const ListingContextProvider = ({ children }) => {
     }
   }, []);
 
+  const createCheckoutSession = useCallback(async (bookingId) => {
+    try {
+      const { data } = await api.post("/payment/create-checkout-session", { bookingId });
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      toast.error("Failed to start payment. Please try again.");
+      console.log("Checkout session error", error);
+    }
+  }, []);
+
+  // ── Reviews ──────────────────────────────────────────────
+  const getReviews = useCallback(async (listingId) => {
+    try {
+      const { data } = await api.get("/review/get-all", { params: { id: listingId } });
+      return data.reviews || [];
+    } catch (error) {
+      console.log("get reviews error", error);
+      return [];
+    }
+  }, []);
+
+  const addReview = useCallback(async (payload) => {
+    try {
+      const { data } = await api.post("/review/add", payload);
+      toast.success("Review added!");
+      return data.review;
+    } catch (error) {
+      toast.error("Failed to add review.");
+      console.log("add review error", error);
+      return null;
+    }
+  }, []);
+
+  const editReview = useCallback(async (payload) => {
+    try {
+      const { data } = await api.put("/review/edit", payload);
+      toast.success("Review updated!");
+      return data.review;
+    } catch (error) {
+      toast.error("Failed to update review.");
+      console.log("edit review error", error);
+      return null;
+    }
+  }, []);
+
+  const deleteReview = useCallback(async (reviewId) => {
+    try {
+      await api.delete("/review/delete", { params: { id: reviewId } });
+      toast.success("Review deleted.");
+      return true;
+    } catch (error) {
+      toast.error("Failed to delete review.");
+      console.log("delete review error", error);
+      return false;
+    }
+  }, []);
+
   useEffect(() => {
     getAllListings();
   }, []);
+
   const values = useMemo(
     () => ({
       getAllListings,
@@ -110,8 +176,14 @@ const ListingContextProvider = ({ children }) => {
       listings,
       addNewListing,
       editListing,
+      deleteListing,
       bookListing,
-      getMyBookings
+      getMyBookings,
+      createCheckoutSession,
+      getReviews,
+      addReview,
+      editReview,
+      deleteReview,
     }),
     [
       getAllListings,
@@ -120,9 +192,16 @@ const ListingContextProvider = ({ children }) => {
       getMyBookings,
       addNewListing,
       editListing,
+      deleteListing,
       bookListing,
+      createCheckoutSession,
+      getReviews,
+      addReview,
+      editReview,
+      deleteReview,
     ],
   );
+
   return (
     <ListingContext.Provider value={values}>{children}</ListingContext.Provider>
   );
