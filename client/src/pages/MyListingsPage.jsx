@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
 
 export default function MyListingsPage() {
-  const { listings, deleteListing } = useListing();
+  const { listings, deleteListing} = useListing();
   const { user } = useAuth();
   const [confirmId, setConfirmId] = useState(null);
   const [deleting, setDeleting] = useState(false);

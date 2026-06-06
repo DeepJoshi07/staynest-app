@@ -66,6 +66,8 @@ export const newListing = async (req, res) => {
     //rating,reviews,
   });
 
+  await listing.populate("host");
+
   if (!listing) {
     return res.status(500).json({ message: "internal server error!" });
   }
@@ -143,8 +145,8 @@ export const editListing = async (req, res) => {
       ...(result !== null && result.length > 0 && { images: result }),
       //rating,reviews,
     },
-    { returnDocument: "after" },
-  );
+    { new: true },
+  ).populate("host");
 
   if (!listing) {
     return res.status(500).json({
@@ -174,7 +176,6 @@ export const listingDetail = async (req, res) => {
 export const bookListing = async (req, res) => {
   const { price, from, till, people, listingId } = req.body;
   //listingId, guestId, from, till, payment, reserved, reservedTill, expireAt, people, price
-  console.log("hello")
   const booking = await Booking.create({
     price,
     from,
@@ -225,6 +226,11 @@ export const deleteListing = async(req,res) => {
       message:"Listing not found!"
     })
   }
+  const publicIds = listing.images.map((i) => i.publicId);
 
+  await cloudinary.api.delete_resources(publicIds)
+
+  await Review.deleteMany({listingId:listing._id});
+  
   return res.status(200).json({listing})
 }

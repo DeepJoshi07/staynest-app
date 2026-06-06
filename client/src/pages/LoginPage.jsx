@@ -2,9 +2,10 @@ import { Helmet } from "react-helmet-async";
 import { useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useEffect } from "react";
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login,accessToken } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
@@ -21,7 +22,13 @@ export default function LoginPage() {
     }
   };
 
-  return (
+  useEffect(() => {
+    if(accessToken){
+      navigate("/")
+    }
+  },[accessToken,navigate])
+
+    return (
     <section className="container-base py-12">
       <Helmet>
         <title>Login | Staynest</title>

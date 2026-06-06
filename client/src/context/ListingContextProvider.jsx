@@ -15,14 +15,14 @@ export const ListingContext = createContext(null);
 export const useListing = () => useContext(ListingContext);
 
 const ListingContextProvider = ({ children }) => {
-
   const api = UseApi();
 
   const [listings, setListings] = useState([]);
 
   const getAllListings = useCallback(async () => {
     try {
-      const {data} = await api.get("/listing/all-listings");
+      const { data } = await api.get("/listing/all-listings");
+
       if (data) {
         setListings(data);
       }
@@ -34,8 +34,8 @@ const ListingContextProvider = ({ children }) => {
 
   const getListingDetail = useCallback(async (id) => {
     try {
-      const {data} = await api.get("/listing/detail", { params:{id} });
-      
+      const { data } = await api.get("/listing/detail", { params: { id } });
+
       if (data.listing) {
         return data.listing;
       } else {
@@ -49,12 +49,15 @@ const ListingContextProvider = ({ children }) => {
 
   const addNewListing = useCallback(async (formData) => {
     try {
-      const res = await api.post("/listing/add", formData, {
+      const { data } = await api.post("/listing/add", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      console.log(res);
+      if (data) {
+        setListings((prev) => [...prev, data.listing]);
+        getAllListings();
+      }
     } catch (error) {}
-  }, []);
+  }, [getAllListings]);
 
   const editListing = useCallback(async (formData) => {
     try {
@@ -62,15 +65,18 @@ const ListingContextProvider = ({ children }) => {
         headers: { "Content-Type": "multipart/form-data" },
       });
       if (data.listing) {
-        setListings(prev => prev.map(l => l._id === data.listing._id ? data.listing : l));
+        setListings((prev) =>
+          prev.map((l) => (l._id === data.listing._id ? data.listing : l)),
+        );
+        getAllListings();
       }
     } catch (error) {}
-  }, []);
+  }, [getAllListings]);
 
   const deleteListing = useCallback(async (listingId) => {
     try {
       await api.delete("/listing/delete", { params: { id: listingId } });
-      setListings(prev => prev.filter(l => l._id !== listingId));
+      setListings((prev) => prev.filter((l) => l._id !== listingId));
       toast.success("Listing deleted successfully!");
       return true;
     } catch (error) {
@@ -83,7 +89,6 @@ const ListingContextProvider = ({ children }) => {
   const bookListing = useCallback(async (formData) => {
     try {
       const result = await api.post("/listing/booked", formData);
-      console.log(result)
       if (result) {
         return result.data;
       } else {
@@ -94,11 +99,11 @@ const ListingContextProvider = ({ children }) => {
 
   const getMyBookings = useCallback(async () => {
     try {
-      const {data} = await api.get("/listing/my-bookings");
+      const { data } = await api.get("/listing/my-bookings");
       if (data.bookings.length > 0) {
         return data.bookings;
-      }else{
-        return []
+      } else {
+        return [];
       }
     } catch (error) {
       toast.error("fetching booking error");
@@ -108,7 +113,9 @@ const ListingContextProvider = ({ children }) => {
 
   const createCheckoutSession = useCallback(async (bookingId) => {
     try {
-      const { data } = await api.post("/payment/create-checkout-session", { bookingId });
+      const { data } = await api.post("/payment/create-checkout-session", {
+        bookingId,
+      });
       if (data?.url) {
         window.location.href = data.url;
       }
@@ -121,7 +128,9 @@ const ListingContextProvider = ({ children }) => {
   // ── Reviews ──────────────────────────────────────────────
   const getReviews = useCallback(async (listingId) => {
     try {
-      const { data } = await api.get("/review/get-all", { params: { id: listingId } });
+      const { data } = await api.get("/review/get-all", {
+        params: { id: listingId },
+      });
       return data.reviews || [];
     } catch (error) {
       console.log("get reviews error", error);
@@ -167,7 +176,7 @@ const ListingContextProvider = ({ children }) => {
 
   useEffect(() => {
     getAllListings();
-  }, []);
+  }, [getAllListings]);
 
   const values = useMemo(
     () => ({

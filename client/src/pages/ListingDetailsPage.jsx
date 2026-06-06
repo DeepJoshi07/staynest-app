@@ -7,6 +7,8 @@ import { useListing } from "../context/ListingContextProvider";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
 import UserImage from "../assets/user.png";
+import Map from "../components/Map";
+
 
 export default function ListingDetailsPage() {
   const { bookListing, getListingDetail, getReviews, addReview, editReview, deleteReview } = useListing();
@@ -157,7 +159,7 @@ export default function ListingDetailsPage() {
           <div className="rounded-2xl bg-white p-4 shadow-sm">
             <h3 className="mb-2 font-semibold">Map</h3>
             <div className="grid h-48 place-items-center rounded-xl bg-slate-100 text-slate-500">
-              Map placeholder
+            <Map place={listing.location}/>
             </div>
           </div>
 
@@ -360,7 +362,7 @@ function ReviewCard({ review, isOwner, onEdit, onDelete }) {
       <div className="mb-3 flex items-start justify-between gap-2">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-primary to-rose-400 font-bold text-white">
-            {review.author?.username?.charAt(0)?.toUpperCase() || "?"}
+            <img src={review.author.image} className="rounded-full" alt="" />
           </div>
           <div>
             <p className="font-medium text-slate-800">{review.author?.username || "Anonymous"}</p>

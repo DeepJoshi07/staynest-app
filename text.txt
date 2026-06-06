@@ -22,3 +22,5 @@ const session = await stripe.checkout.sessions.create({
     success_url: `${clientBaseUrl}/dashboard/mybookings?payment=success`,
     cancel_url: `${clientBaseUrl}/dashboard/mybookings?payment=cancelled`,
   });
+
+  maptiler:sjle6me3pDU53LGaJzGV

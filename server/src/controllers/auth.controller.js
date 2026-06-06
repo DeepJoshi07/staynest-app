@@ -274,6 +274,7 @@ export const updateImage = async (req, res) => {
     image:user.image
   } });
 };
+
 // export const logoutAll = async (req, res) => {
 //   const refreshToken = req.cookies.refreshToken;
 
