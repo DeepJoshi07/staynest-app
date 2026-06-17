@@ -88,6 +88,7 @@ export default function MyListingsPage() {
                 {confirmId === listing._id ? (
                   <div className="flex items-center gap-2">
                     <button
+                      type="button"
                       onClick={() => handleDelete(listing._id)}
                       disabled={deleting}
                       className="rounded-lg bg-red-500 px-3 py-1.5 text-sm text-white hover:bg-red-600 disabled:opacity-60"
@@ -95,6 +96,7 @@ export default function MyListingsPage() {
                       {deleting ? "Deleting..." : "Confirm"}
                     </button>
                     <button
+                      type="button"
                       onClick={() => setConfirmId(null)}
                       className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-100"
                     >
@@ -103,6 +105,7 @@ export default function MyListingsPage() {
                   </div>
                 ) : (
                   <button
+                    type="button"
                     onClick={() => setConfirmId(listing._id)}
                     className="flex items-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-sm text-red-500 transition hover:bg-red-50"
                   >

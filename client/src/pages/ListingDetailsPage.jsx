@@ -79,7 +79,7 @@ export default function ListingDetailsPage() {
       : null;
 
   // Check if current user already reviewed
-  const myReview = user ? reviews.find((r) => r.author?._id === user._id) : null;
+  const myReview = user ? reviews.find((r) => r.author?._id === user._id || r.author?.username === user.username) : null;
 
   if (!listing || !listing._id) {
     return (
@@ -158,7 +158,7 @@ export default function ListingDetailsPage() {
           {/* Map placeholder */}
           <div className="rounded-2xl bg-white p-4 shadow-sm">
             <h3 className="mb-2 font-semibold">Map</h3>
-            <div className="grid h-48 place-items-center rounded-xl bg-slate-100 text-slate-500">
+            <div className="relative z-0 grid h-48 place-items-center overflow-hidden rounded-xl bg-slate-100 text-slate-500">
             <Map place={listing.location}/>
             </div>
           </div>
@@ -207,7 +207,7 @@ export default function ListingDetailsPage() {
                   <ReviewCard
                     key={r._id}
                     review={r}
-                    isOwner={user && r.author?._id === user._id}
+                isOwner={user && (r.author?._id === user._id || r.author?.username === user.username)}
                     onEdit={(payload) => handleEditReview(r._id, payload)}
                     onDelete={() => handleDeleteReview(r._id)}
                   />
@@ -341,6 +341,7 @@ function ReviewCard({ review, isOwner, onEdit, onDelete }) {
         <div className="mb-2 flex items-center justify-between">
           <p className="font-medium text-slate-700">Edit your review</p>
           <button
+            type="button"
             onClick={() => setEditing(false)}
             className="text-sm text-slate-400 hover:text-slate-600"
           >
@@ -362,7 +363,7 @@ function ReviewCard({ review, isOwner, onEdit, onDelete }) {
       <div className="mb-3 flex items-start justify-between gap-2">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-primary to-rose-400 font-bold text-white">
-            <img src={review.author.image} className="rounded-full" alt="" />
+            <img src={review.author?.image?.imageUrl || UserImage} className="h-full w-full rounded-full object-cover" alt="" />
           </div>
           <div>
             <p className="font-medium text-slate-800">{review.author?.username || "Anonymous"}</p>
@@ -384,6 +385,7 @@ function ReviewCard({ review, isOwner, onEdit, onDelete }) {
       {isOwner && (
         <div className="mt-3 flex items-center gap-3 border-t border-slate-100 pt-3">
           <button
+            type="button"
             onClick={() => setEditing(true)}
             className="flex items-center gap-1 text-xs font-medium text-slate-500 transition hover:text-brand-primary"
           >
@@ -396,12 +398,14 @@ function ReviewCard({ review, isOwner, onEdit, onDelete }) {
             <div className="flex items-center gap-2 text-xs">
               <span className="text-slate-500">Are you sure?</span>
               <button
+                type="button"
                 onClick={onDelete}
                 className="font-medium text-red-500 hover:text-red-700"
               >
                 Yes, delete
               </button>
               <button
+                type="button"
                 onClick={() => setConfirmDelete(false)}
                 className="text-slate-400 hover:text-slate-600"
               >
@@ -410,6 +414,7 @@ function ReviewCard({ review, isOwner, onEdit, onDelete }) {
             </div>
           ) : (
             <button
+              type="button"
               onClick={() => setConfirmDelete(true)}
               className="flex items-center gap-1 text-xs font-medium text-slate-500 transition hover:text-red-500"
             >
@@ -544,7 +549,7 @@ const Reserve = ({ listing, onClick }) => {
 
       <div className="mt-4 flex items-center gap-3 text-sm">
         <img
-          src={listing.host?.image || UserImage}
+          src={listing.host?.image.imageUrl || UserImage}
           alt={listing.host?.username || "unknown"}
           className="h-8 w-8 rounded-full object-cover"
         />

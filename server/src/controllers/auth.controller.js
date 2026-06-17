@@ -72,6 +72,7 @@ export const register = async (req, res) => {
   return res.status(200).json({
     message: "User created!",
     user: {
+      _id: user._id,
       username: user.username,
       email: user.email,
       image: user.image || "",
@@ -148,6 +149,7 @@ export const login = async (req, res) => {
   return res.status(200).json({
     message: "user logged in successfully!",
     user: {
+      _id: user._id,
       username: user.username,
       email: user.email,
       image: user.image || " ",
@@ -237,7 +239,12 @@ export const refreshToken = async (req, res) => {
 
   return res.status(200).json({
     message: "access token refreshed successfully!",
-    user,
+    user: {
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      image: user.image || "",
+    },
     accessToken,
   });
 };
@@ -295,10 +302,10 @@ export const updateImage = async (req, res) => {
 
   res.status(200).json({
     user: {
+      _id: user._id,
       username: user.username,
       email: user.email,
       image: user.image,
     },
   });
 };
-
