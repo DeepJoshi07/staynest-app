@@ -92,43 +92,45 @@ export const editListing = async (req, res) => {
 
   const oldListing = await Listing.findById(id);
 
-  if(!oldListing){
+  if (!oldListing) {
     return res.status(400).json({
-      message:"listing not found!"
-    })
+      message: "listing not found!",
+    });
   }
 
-  const publicIds = oldListing.images.map((img) => img.imageUrl);
+  const publicIds = oldListing.images.map((img) => img.publicId);
 
-  if (req.files || req.files.length > 0) {
+  if (req.files && req.files.length > 0) {
     try {
-      const result = await cloudinary.api.delete_derived_resources(publicIds,{
-        resourcw_type:'image'
-      })
-      const uploadPromises = req.files.map((file, index) => {
-      return new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          {
-            folder: "staynest",
-            public_id: `img_${Date.now()}_${index}`,
-          },
-          (error, result) => {
-            if (error) reject(error);
-            else
-              resolve({
-                imageUrl: result.secure_url,
-                publicId: result.public_id,
-              });
-          },
-        );
-        stream.end(file.buffer);
+      const result = await cloudinary.api.delete_derived_resources(publicIds, {
+        resource_type: "image",
       });
-    });
-    result = await Promise.all(uploadPromises);
+      const uploadPromises = req.files.map((file, index) => {
+        return new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            {
+              folder: "staynest",
+              public_id: `img_${Date.now()}_${index}`,
+            },
+            (error, result) => {
+              if (error) reject(error);
+              else
+                resolve({
+                  imageUrl: result.secure_url,
+                  publicId: result.public_id,
+                });
+            },
+          );
+          stream.end(file.buffer);
+        });
+      });
+      result = await Promise.all(uploadPromises);
     } catch (error) {
-      
+      console.log("image upload error", error);
+      return res.status(500).json({
+        message: "image upload error",
+      });
     }
-    
   }
 
   const listing = await Listing.findByIdAndUpdate(
@@ -161,7 +163,7 @@ export const editListing = async (req, res) => {
 };
 
 export const listingDetail = async (req, res) => {
-  const  id  = req.query.id;
+  const id = req.query.id;
   const listing = await Listing.findById(id).populate("host");
 
   if (!listing) {
@@ -170,7 +172,7 @@ export const listingDetail = async (req, res) => {
     });
   }
 
-  return res.status(200).json({listing});
+  return res.status(200).json({ listing });
 };
 
 export const bookListing = async (req, res) => {
@@ -202,35 +204,35 @@ export const bookListing = async (req, res) => {
 
 export const myBookings = async (req, res) => {
   const id = req.userId;
-  
+
   const bookings = await Booking.find({
     guestId: id,
   }).populate("listingId");
 
-  if(!bookings){
+  if (!bookings) {
     return res.status(200).json({
-      message:"no bookings found!"
-    })
+      message: "no bookings found!",
+    });
   }
 
-  return res.status(200).json({bookings})
+  return res.status(200).json({ bookings });
 };
 
-export const deleteListing = async(req,res) => {
+export const deleteListing = async (req, res) => {
   const id = req.query.id;
 
   const listing = await Listing.findByIdAndDelete(id);
 
-  if(!listing){
+  if (!listing) {
     return res.status(400).json({
-      message:"Listing not found!"
-    })
+      message: "Listing not found!",
+    });
   }
   const publicIds = listing.images.map((i) => i.publicId);
 
-  await cloudinary.api.delete_resources(publicIds)
+  await cloudinary.api.delete_resources(publicIds);
 
-  await Review.deleteMany({listingId:listing._id});
-  
-  return res.status(200).json({listing})
-}
+  await Review.deleteMany({ listingId: listing._id });
+
+  return res.status(200).json({ listing });
+};

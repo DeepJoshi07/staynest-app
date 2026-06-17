@@ -8,7 +8,7 @@ import paymentRouter from "./routes/payment.route.js";
 import reviewRouter from './routes/review.route.js'
 import cors from "cors";
 
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5050;
 
 const app = express();
 

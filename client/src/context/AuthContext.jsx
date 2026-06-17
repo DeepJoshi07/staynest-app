@@ -88,12 +88,17 @@ export function AuthProvider({ children }) {
   }, []);
 
   const updateImage = useCallback(async (formData) => {
-    console.log("hello")
-    const result = await api.post("/auth/update-user-image", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    if (result.status === 200) {
-      return { message: "user image updated!" };
+    try {
+      console.log("hello");
+      const result = await api.post("/auth/update-user-image", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      if (result.status === 200) {
+        return { message: "user image updated!" };
+      }
+    } catch (error) {
+      console.log("image upload error", error);
+      toast.error("image upload faild!");
     }
   }, []);
 

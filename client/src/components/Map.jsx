@@ -8,8 +8,8 @@ export default function Map({place} ) {
   const map = useRef(null);
 
   const geoCodoing = async (place) => {
-    maptilerClient.config.apiKey = import.meta.env.VITE_MAP_TILER_API_KEY;
-    maptilersdk.config.apiKey = import.meta.env.VITE_MAP_TILER_API_KEY;
+    maptilerClient.config.apiKey = import.meta.env.VITE_API_MAP_TILER;
+    maptilersdk.config.apiKey = import.meta.env.VITE_API_MAP_TILER;
 
     const result = await maptilerClient.geocoding.forward(place);
     const [lon, lat] = result.features[0].geometry.coordinates;

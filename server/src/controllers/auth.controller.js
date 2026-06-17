@@ -74,7 +74,7 @@ export const register = async (req, res) => {
     user: {
       username: user.username,
       email: user.email,
-      image: user.image || ""
+      image: user.image || "",
     },
     accessToken,
   });
@@ -150,7 +150,7 @@ export const login = async (req, res) => {
     user: {
       username: user.username,
       email: user.email,
-      image:user.image || " "
+      image: user.image || " ",
     },
     accessToken,
   });
@@ -244,74 +244,61 @@ export const refreshToken = async (req, res) => {
 
 export const updateImage = async (req, res) => {
   const fileBuffer = req.file.buffer;
-  
+
   const user = await User.findById(req.userId);
 
-  if(!user){
-    return res.status(400).json({message:"User not found!"})
+  if (!user) {
+    return res.status(400).json({ message: "User not found!" });
   }
-  const result = await new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
-      {
-        folder: "staynest",
-        public_id: `img_${Date.now()}`,
-        resource_type: "image",
-      },
-      (error, result) => {
-        if (error) reject(error);
-        else resolve(result);
-      },
-    );
-    stream.end(fileBuffer)
+
+  const publicIds = user.image?.publicId || null;
+
+  if (req.file) {
+    try {
+      if (publicIds) {
+        const result = await cloudinary.api.delete_derived_resources(
+          publicIds,
+          {
+            resource_type: "image",
+          },
+        );
+      }
+
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: "userImages",
+            public_id: `img_${Date.now()}`,
+            resource_type: "image",
+          },
+          (error, result) => {
+            if (error) reject(error);
+            else
+              resolve({
+                imageUrl: result.secure_url,
+                publicId: result.public_id,
+              });
+          },
+        );
+        stream.end(fileBuffer);
+      });
+
+      user.image = result;
+      user.save();
+    } catch (error) {
+      console.log("image upload error",error);
+      return res.status(500).json({
+        message:"image upload error"
+      })
+    }
+  }
+
+  res.status(200).json({
+    user: {
+      username: user.username,
+      email: user.email,
+      image: user.image,
+    },
   });
-
-  user.image = result.secure_url;
-  user.save()
-
-  res.status(200).json({ user:{
-    username:user.username,
-    email:user.email,
-    image:user.image
-  } });
 };
 
-// export const logoutAll = async (req, res) => {
-//   const refreshToken = req.cookies.refreshToken;
-
-//   if (!refreshToken) {
-//     return res.status(400).json({
-//       message: "refresh token not found",
-//     });
-//   }
-
-//   const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
-
-//   if (!decoded) {
-//     return res.status(400).json({
-//       message: "invalid refresh token",
-//     });
-//   }
-//   console.log(decoded.id);
-//   await Session.updateMany(
-//     {
-//       user: decoded.id,
-//       revoked: false,
-//     },
-//     {
-//       $set: {
-//         revokedAt: new Date(),
-
-//         revoked: true,
-//       },
-//       $unset:{
-//         expiresAt: "",
-//       }
-//     },
-//   );
-
-//   res.clearCookie("refreshToken");
-
-//   return res.status(200).json({
-//     message: "user logged out from all devices successfully!",
-//   });
-// };
