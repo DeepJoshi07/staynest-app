@@ -25,11 +25,9 @@ const authSchema = new mongoose.Schema(
     image: {
       imageUrl: {
         type: String,
-        required: [true, "ImageUrl is required"],
       },
       publicId: {
         type: String,
-        required: [true, "PublicId required"],
       },
     },
   },

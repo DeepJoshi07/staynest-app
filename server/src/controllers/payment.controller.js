@@ -1,5 +1,6 @@
 import stripe from "../config/stripe.js";
 import Booking from "../models/booked.model.js";
+import { addBookedDatesToListing } from "./listings.controller.js";
 
 /**
  * POST /api/payment/create-checkout-session
@@ -96,9 +97,22 @@ export const stripeWebhook = async (req, res) => {
     const bookingId = session.metadata?.bookingId;
 
     if (bookingId) {
-      await Booking.findByIdAndUpdate(bookingId, {
-        payment: ["conformed"],
-      });
+      const booking = await Booking.findByIdAndUpdate(
+        bookingId,
+        { payment: ["conformed"] },
+        { new: true }
+      );
+      if (booking) {
+        await addBookedDatesToListing(booking.listingId, booking.from, booking.till);
+        // Delete other pending bookings that overlap with this confirmed booking's dates
+        await Booking.deleteMany({
+          listingId: booking.listingId,
+          _id: { $ne: booking._id },
+          payment: "pendding",
+          from: { $lte: booking.till },
+          till: { $gte: booking.from },
+        });
+      }
     }
   }
 

@@ -16,6 +16,7 @@ export default function MyBookingsPage() {
   useEffect(() => {
     const paymentStatus = searchParams.get("payment");
     if (paymentStatus === "success") {
+      
       toast.success("🎉 Payment successful! Your booking is confirmed.");
       setSearchParams({});
     } else if (paymentStatus === "cancelled") {

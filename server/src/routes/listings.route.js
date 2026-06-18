@@ -2,6 +2,7 @@ import express from "express";
 import { wrapper } from "../utils/wrapper.js";
 import {
   allListings,
+  // bookedlisting,
   bookListing,
   deleteListing,
   editListing,
@@ -21,5 +22,6 @@ router.delete("/delete", authUser, wrapper(deleteListing));
 router.get("/detail", wrapper(listingDetail));
 router.post("/booked", authUser, wrapper(bookListing));
 router.get("/my-bookings", authUser, wrapper(myBookings));
+// router.post("/booked-listing", authUser, wrapper(bookedlisting));
 
 export default router;

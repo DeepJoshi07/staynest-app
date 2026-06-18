@@ -23,7 +23,13 @@ app.use(cors(corsOptions));
 // app.options("*", cors(corsOptions));
 
 app.use(cookieParser());
-app.use(express.json());
+app.use((req, res, next) => {
+  if (req.originalUrl === "/api/payment/webhook") {
+    next();
+  } else {
+    express.json()(req, res, next);
+  }
+});
 
 app.use("/api/auth", authRouter);
 app.use("/api/listing", listingRouter);

@@ -37,10 +37,8 @@ const ListingContextProvider = ({ children }) => {
       const { data } = await api.get("/listing/detail", { params: { id } });
 
       if (data.listing) {
-        return data.listing;
-      } else {
-        return {};
-      }
+        return data.listing || {};
+      } 
     } catch (error) {
       toast.error("fetching listing detail error");
       console.log("fetching listing detail Error", error);
@@ -111,6 +109,21 @@ const ListingContextProvider = ({ children }) => {
     }
   }, []);
 
+  const bookedListing = useCallback(async(id) => {
+    try {
+      const { data } = await api.post("/listing/booked-listing",{listingId:id});
+      if (data.bookings.length > 0) {
+        return data.bookings;
+      } else {
+        return [];
+      }
+    } catch (error) {
+      toast.error("fetching booking error");
+      console.log("fetching booking Error", error);
+    }
+  },[])
+
+  //--------------------- stripe checkout ---------------------
   const createCheckoutSession = useCallback(async (bookingId) => {
     try {
       const { data } = await api.post("/payment/create-checkout-session", {

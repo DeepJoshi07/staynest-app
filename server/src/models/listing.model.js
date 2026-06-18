@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { type } from "os";
 
 const listingSchema = new mongoose.Schema(
   {
@@ -61,6 +62,10 @@ const listingSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
       required: [true, "Host is required"],
+    },
+    bookedDates: {
+      type: [Date],
+      default: [],
     },
     reviews: [
       {

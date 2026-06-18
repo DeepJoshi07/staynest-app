@@ -438,18 +438,9 @@ const Reserve = ({ listing, onClick }) => {
     till: null,
     people: 1,
   });
-
-  const bookedDates = (
-    listing.bookedDates || [
-      "2026/05/22",
-      "2026/05/23",
-      "2026/05/24",
-      "2026/05/25",
-      "2026/06/01",
-      "2026/06/02",
-      "2026/06/03",
-    ]
-  ).map((d) => new Date(d));
+//  console.log(listing)
+  
+  const bookedDates = (listing.bookedDates || []).map((d) => new Date(d));
 
   let maxDateForTill = null;
   if (detail.from) {

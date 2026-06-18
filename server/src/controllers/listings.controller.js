@@ -172,23 +172,82 @@ export const listingDetail = async (req, res) => {
     });
   }
 
-  return res.status(200).json({ listing });
+  // Find all active unexpired pending reservations for this listing
+  const activeReservations = await Booking.find({
+    listingId: id,
+    payment: "pendding",
+    reserved: true,
+    reservedTill: { $gt: new Date() },
+  });
+
+  // Generate intermediate dates for these reservations
+  const reservedDates = [];
+  for (const reservation of activeReservations) {
+    const start = new Date(reservation.from);
+    const end = new Date(reservation.till);
+    start.setUTCHours(0, 0, 0, 0);
+    end.setUTCHours(0, 0, 0, 0);
+
+    const current = new Date(start);
+    while (current <= end) {
+      reservedDates.push(new Date(current));
+      current.setUTCDate(current.getUTCDate() + 1);
+    }
+  }
+
+  // Combine confirmed bookedDates and pending reservedDates
+  const allUnavailableDates = [
+    ...(listing.bookedDates || []),
+    ...reservedDates,
+  ].map((d) => new Date(d).toISOString());
+
+  // Filter unique dates
+  const uniqueUnavailableDates = [...new Set(allUnavailableDates)].map((d) => new Date(d));
+
+  const listingObj = listing.toObject();
+  listingObj.bookedDates = uniqueUnavailableDates;
+
+  return res.status(200).json({ listing: listingObj });
 };
 
 export const bookListing = async (req, res) => {
   const { price, from, till, people, listingId } = req.body;
-  //listingId, guestId, from, till, payment, reserved, reservedTill, expireAt, people, price
+
+  const requestedFrom = new Date(from);
+  const requestedTill = new Date(till);
+
+  // Find any active overlapping booking or reservation for the same listing
+  const overlapping = await Booking.findOne({
+    listingId,
+    from: { $lte: requestedTill },
+    till: { $gte: requestedFrom },
+    $or: [
+      { payment: "conformed" },
+      {
+        reserved: true,
+        reservedTill: { $gt: new Date() },
+      },
+    ],
+  });
+
+  if (overlapping) {
+    return res.status(400).json({
+      message: "The selected dates are already booked or reserved. Please choose other dates.",
+    });
+  }
+
+  // listingId, guestId, from, till, payment, reserved, reservedTill, expireAt, people, price
   const booking = await Booking.create({
     price,
-    from,
-    till,
+    from: requestedFrom,
+    till: requestedTill,
     people,
-    expireAt: till,
+    expireAt: requestedTill,
     listingId,
     guestId: req.userId,
     payment: "pendding",
     reserved: true,
-    reservedTill: Date.now() + 2 * 24 * 60 * 60 * 1000,
+    reservedTill: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
   });
 
   if (!booking) {
@@ -218,6 +277,7 @@ export const myBookings = async (req, res) => {
   return res.status(200).json({ bookings });
 };
 
+
 export const deleteListing = async (req, res) => {
   const id = req.query.id;
 
@@ -235,4 +295,38 @@ export const deleteListing = async (req, res) => {
   await Review.deleteMany({ listingId: listing._id });
 
   return res.status(200).json({ listing });
+};
+
+/**
+ * Adds all dates from 'from' to 'till' (inclusive) to the listing's bookedDates.
+ * Ensures there are no duplicate dates.
+ * @param {string} listingId - The ID of the listing to update.
+ * @param {Date|string} from - The starting date of the booking.
+ * @param {Date|string} till - The ending date of the booking.
+ */
+export const addBookedDatesToListing = async (listingId, from, till) => {
+  const dates = [];
+  const start = new Date(from);
+  const end = new Date(till);
+
+  // Normalize dates to UTC start-of-day to prevent timezone shifts and duplicate values
+  start.setUTCHours(0, 0, 0, 0);
+  end.setUTCHours(0, 0, 0, 0);
+
+  const current = new Date(start);
+  while (current <= end) {
+    dates.push(new Date(current));
+    current.setUTCDate(current.getUTCDate() + 1);
+  }
+
+  // Use $addToSet with $each to ensure no duplicate Date entries in the MongoDB array
+  const updatedListing = await Listing.findByIdAndUpdate(
+    listingId,
+    {
+      $addToSet: { bookedDates: { $each: dates } },
+    },
+    { new: true }
+  );
+
+  return updatedListing;
 };

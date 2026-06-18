@@ -6,7 +6,7 @@ import cloudinary from "../config/cloudinary.js";
 
 export const register = async (req, res) => {
   const { username, email, password } = req.body;
-
+ 
   const alreadyExists = await User.findOne({
     $or: [{ username }, { email }],
   });
